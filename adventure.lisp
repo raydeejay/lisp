@@ -65,11 +65,12 @@
 (defun inventory ()
   (cons 'items- (objects-at 'body *objects* *object-locations*)))
 
-(defun game-repl ()
-  (let ((cmd (game-read)))
-    (unless (eq (car cmd) 'quit)
-      (game-print (game-eval cmd))
-      (game-repl))))
+(defparameter *allowed-commands* '(look walk pickup inventory))
+
+(defun game-eval (sexp)
+  (if (member (car sexp) *allowed-commands*)
+      (eval sexp)
+      '(i do not know that command.)))
 
 (defun game-read ()
   (let ((cmd (read-from-string
@@ -77,13 +78,6 @@
     (flet ((quote-it (x)
              (list 'quote x)))
       (cons (car cmd) (mapcar #'quote-it (cdr cmd))))))
-
-(defparameter *allowed-commands* '(look walk pickup inventory))
-
-(defun game-eval (sexp)
-  (if (member (car sexp) *allowed-commands*)
-      (eval sexp)
-      '(i do not know that command.)))
 
 (defun tweak-text (lst caps lit)
   (when lst
@@ -104,4 +98,10 @@
                              nil)
                  'string))
   (fresh-line))
+
+(defun game-repl ()
+  (let ((cmd (game-read)))
+    (unless (eq (car cmd) 'quit)
+      (game-print (game-eval cmd))
+      (game-repl))))
 

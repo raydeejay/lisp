@@ -5,7 +5,7 @@
     (garden
      (you are in a beautiful garden. there is a well in front of you.))
     (attic
-     (you are in the attic. yhere is a giant torch in the corner.))))
+     (you are in the attic. there is a giant torch in the corner.))))
 
 (defun describe-location (location nodes)
   (cadr (assoc location nodes)))

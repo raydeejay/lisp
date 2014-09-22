@@ -49,7 +49,7 @@
                      :energy 1000
                      :dir    0
                      :genes (loop repeat 8
-                               collecting (1+ (random 10))))))
+                                  collecting (1+ (random 10))))))
 
 (defun move (animal)
   (let ((dir (animal-dir animal))
@@ -74,12 +74,12 @@
     (decf (animal-energy animal))))
 
 (defun turn (animal)
-  (let ((x (random (apply #'+ (animal-genes animal)))))
-    (labels ((angle (genes x)
-               (let ((xnu (- x (car genes))))
-                 (if (< xnu 0)
-                     0
-                     (1+ (angle (cdr genes) xnu))))))
+  (let ((x (random (apply '+ (animal-genes animal)))))
+    (cl-labels ((angle (genes x)
+                       (let ((xnu (- x (car genes))))
+                         (if (< xnu 0)
+                             0
+                           (1+ (angle (cdr genes) xnu))))))
       (setf (animal-dir animal)
             (mod (+ (animal-dir animal) (angle (animal-genes animal) x))
                  8
@@ -119,31 +119,53 @@
 (defun draw-world ()
   (erase-buffer)
   (loop for y
-     below *height*
-     do (progn (fresh-line)
-               (princ "|")
-               (loop for x
-                  below *width*
-                  do (princ (cond ((some (lambda (animal)
-                                           (and (= (animal-x animal) x)
-                                                (= (animal-y animal) y)))
-                                         *animals*)
-                                   #\M)
-                                  ((gethash (cons x y) *plants*) #\*)
-                                  (t #\space))))
-               (princ "|"))))
+        below *height*
+        do (progn (newline)
+                  (insert "|")
+                  (loop for x
+                        below *width*
+                        do (insert (cond ((some (lambda (animal)
+                                                  (and (= (animal-x animal) x)
+                                                       (= (animal-y animal) y)))
+                                                *animals*)
+                                          ?M )
+                                         ((gethash (cons x y) *plants*) ?\* )
+                                         (t ?\s ))))
+                  (insert "|")))
+  (redisplay t))
+
+(defun draw-border ()
+  (loop for y
+        below *height*
+        do (progn (newline)
+                  (insert "|")
+                  (loop for x
+                        below *width*
+                        do (insert (cond ((some (lambda (animal)
+                                                  (and (= (animal-x animal) x)
+                                                       (= (animal-y animal) y)))
+                                                *animals*)
+                                          ?M )
+                                         ((gethash (cons x y) *plants*) ?\* )
+                                         (t ?\s ))))
+                  (insert "|")))
+  (redisplay t))
+
+(defun draw-plants ())
+
+(defun draw-animals ())
 
 (defun evolution ()
+  (interactive)
   (draw-world)
   (newline)
   (let ((str (read-string "Steps (or 'quit'): ")))
     (cond ((equal str "quit") ())
-          (t (let ((x (parse-integer str :junk-allowed t)))
+          (t (let ((x (string-to-int str)))
                (if x
                    (loop for i
-                      below x
-                      do (update-world)
-                      if (zerop (mod i 1000))
-                      do (princ #\.))
-                   (update-world))
-               (evolution))))))
+                         below x
+                         do (update-world)
+                         (draw-world))
+                 (evolution)))))))
+

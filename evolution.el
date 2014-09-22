@@ -10,7 +10,7 @@
     (setf (gethash pos *plants*) t)))
 
 (defun add-plants ()
-  (apply '#random-plant *jungle*)
+  (apply #'random-plant *jungle*)
   (random-plant 0 0 *width* *height*))
 
 (defstruct animal x y energy dir genes)
@@ -27,7 +27,7 @@
   (let ((dir (animal-dir animal))
         (x (animal-x animal))
         (y (animal-y animal)))
-    (setf (animal-x animal-x)
+    (setf (animal-x animal)
           (mod (+ x
                   (cond ((and (>= dir 2) (<= dir 4)) 1)
                         ((or (= dir 1) (= dir 5)) 0)
@@ -35,7 +35,7 @@
                   *width*)
                *width*))
 
-    (setf (animal-y animal-y)
+    (setf (animal-y animal)
           (mod (+ y
                   (cond ((and (>= dir 1) (<= dir 2)) -1)
                         ((or (= dir 3) (= dir 7)) 0)
@@ -58,7 +58,7 @@
                  )))))
 
 (defun eat (animal)
-  (let ((pos (cons (animal-x animal-x) (animal-y animal))))
+  (let ((pos (cons (animal-x animal) (animal-y animal))))
     (when (gethash pos *plants*)
       (incf (animal-energy animal) *plant-energy*)
       (remhash pos *plants*))))

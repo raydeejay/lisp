@@ -127,7 +127,7 @@
                                                   (and (= (animal-x animal) x)
                                                        (= (animal-y animal) y)))
                                                 evolution-animals)
-                                          ?M )
+                                          ?m )
                                          ((gethash (cons x y) evolution-plants) ?\* )
                                          (t ?\s ))))
                   (insertc "|" "brown" nil)))

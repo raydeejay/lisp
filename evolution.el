@@ -31,8 +31,7 @@
   "Major mode for doing evolution.
 \\{evolution-mode-map}"
   :group "Evolution"
-  (define-key evolution-mode-map (kbd "SPC") 'evolution-draw-patterns)
-  (define-key evolution-mode-map [down-mouse-3] 'evolution-function))
+  (define-key evolution-mode-map (kbd "SPC") 'evolution-start))
 
 ;;;; insert colored and/or bright text
 (defun insert-colored-text (str clr bright)

@@ -122,6 +122,10 @@
         evolution-animals)
   (add-plants))
 
+(defun animal-color (a)
+  (let ((color (max a 255)))
+    (format "#00%X00" color)))
+
 (defun draw-world ()
   (erase-buffer)
   (loop for y
@@ -131,10 +135,10 @@
                   (loop for x
                         below evolution-width
                         do (cond ((some (lambda (animal)
-                                                  (and (= (animal-x animal) x)
-                                                       (= (animal-y animal) y)))
+                                          (and (= (animal-x animal) x)
+                                               (= (animal-y animal) y)))
                                         evolution-animals)
-                                  (insertc "m" "red" nil))
+                                  (insertc "m" (animal-color animal) nil))
                                  ((gethash (cons x y) evolution-plants)
                                   (insertc "*" "green" nil))
                                  (t (insertc " " "darkgrey" nil))))

@@ -120,7 +120,7 @@
   (loop for y
         below evolution-height
         do (progn (newline)
-                  (insertc "|" "green" nil)
+                  (insertc "|" "brown" nil)
                   (loop for x
                         below evolution-width
                         do (insert (cond ((some (lambda (animal)
@@ -130,7 +130,7 @@
                                           ?M )
                                          ((gethash (cons x y) evolution-plants) ?\* )
                                          (t ?\s ))))
-                  (insertc "|" "green" nil)))
+                  (insertc "|" "brown" nil)))
   (redisplay t))
 
 (defun evolution ()

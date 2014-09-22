@@ -7,20 +7,21 @@
 
 (defvar evolution-plants (make-hash-table :test #'equal))
 
+;; create an initial animal, centered, with random genes
 (defvar evolution-animals
   (list (make-animal :x      (ash evolution-width -1)
                      :y      (ash evolution-height -1)
                      :energy 1000
                      :dir    0
-                     :genes (loop repeat 8
-                                  collecting (1+ (random 10))))))
+                     :genes  (loop repeat 8
+                                   collecting (1+ (random 10))))))
 
 (defvar evolution-reproduction-energy 200)
 
 ;; major mode things
 (defun evolution ()
   (interactive)
-  (switch-to-buffer "*evolution*")
+  (switch-to-buffer "*evolution-game*")
   (evolution-mode)
   (font-lock-mode))
 
@@ -30,15 +31,14 @@
 \\{evolution-mode-map}"
   :group "Evolution"
   (define-key evolution-mode-map (kbd "SPC") 'evolution-draw-patterns)
-  (define-key evolution-mode-map [down-mouse-3] 'evolution-function)
-  )
+  (define-key evolution-mode-map [down-mouse-3] 'evolution-function))
 
 ;;;; insert colored and/or bright text
 (defun insert-colored-text (str clr bright)
   "Inserts str at point, in color clr, bright or not."
-  (interactive (list (read-string " String: ")
-                     (read-string " Color: ")
-                     (y-or-n-p    " Bright? ") ))
+  (interactive (list (read-string "String: ")
+                     (read-string "Color: ")
+                     (y-or-n-p    "Bright? ") ))
   (insert (propertize str 'font-lock-face
                       `(:weight ,(if bright 'bold 'normal) :foreground ,clr) )))
 
@@ -65,7 +65,6 @@
                         (t -1))
                   evolution-width)
                evolution-width))
-
     (setf (animal-y animal)
           (mod (+ y
                   (cond ((and (>= dir 1) (<= dir 2)) -1)
@@ -73,7 +72,6 @@
                         (t 1))
                   evolution-height)
                evolution-height))
-
     (decf (animal-energy animal))))
 
 (defun turn (animal)
@@ -107,8 +105,8 @@
 
 (defun update-world ()
   (setf evolution-animals (remove-if (lambda (animal)
-                               (<= (animal-energy animal) 0))
-                             evolution-animals))
+                                       (<= (animal-energy animal) 0))
+                                     evolution-animals))
   (mapc (lambda (animal)
           (turn animal)
           (move animal)

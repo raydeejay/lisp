@@ -18,6 +18,8 @@
 
 (defvar evolution-reproduction-energy 200)
 
+(defvar evolution-fence-color "yellow")
+
 ;; major mode things
 (defun evolution ()
   (interactive)
@@ -120,31 +122,37 @@
   (loop for y
         below evolution-height
         do (progn (newline)
-                  (insertc "|" "brown" nil)
+                  (insertc "|" evolution-fence-color nil)
                   (loop for x
                         below evolution-width
-                        do (insert (cond ((some (lambda (animal)
+                        do (cond ((some (lambda (animal)
                                                   (and (= (animal-x animal) x)
                                                        (= (animal-y animal) y)))
-                                                evolution-animals)
-                                          ?m )
-                                         ((gethash (cons x y) evolution-plants) ?\* )
-                                         (t ?\s ))))
-                  (insertc "|" "brown" nil)))
+                                        evolution-animals)
+                                  (insertc "m" "red" nil))
+                                 ((gethash (cons x y) evolution-plants)
+                                  (insertc "*" "green" nil))
+                                 (t (insertc " " "darkgrey" nil))))
+                  (insertc "|" evolution-fence-color nil)))
+  (newline)
+  (insert (format "Animals: %d -- Plants: %d"
+                  (length evolution-animals)
+                  (hash-table-count evolution-plants)
+                  0))
   (redisplay t))
 
 (defun evolution-start ()
-(let ((inhibit-read-only t))
   (interactive)
-  (draw-world)
-  (newline)
-  (let ((str (read-string "Steps (or 'quit'): ")))
-    (cond ((equal str "quit") ())
-          (t (let ((x (string-to-int str)))
-               (if x
-                   (loop for i
-                         below x
-                         do (update-world)
-                         (draw-world))
-                 (evolution))))))))
+  (let ((inhibit-read-only t))
+    (draw-world)
+    (newline)
+    (let ((str (read-string "Steps (or 'quit'): ")))
+      (cond ((equal str "quit") ())
+            (t (let ((x (string-to-int str)))
+                 (if x
+                     (loop for i
+                           below x
+                           do (update-world)
+                           (draw-world))
+                   (evolution))))))))
 

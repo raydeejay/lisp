@@ -1,9 +1,37 @@
-(defparameter *width* 80)
-(defparameter *height* 30)
-(defparameter *jungle* '(45 10 10 10))
-(defparameter *plant-energy* 80)
+;; evolution.el -- the evolution demo, ported to EmacsLisp
 
-(defparameter *plants* (make-hash-table :test #'equal))
+(defun evolution ()
+  (interactive)
+  (switch-to-buffer "*evolution*")
+  (evolution-mode)
+  (font-lock-mode))
+
+(define-derived-mode evolution-mode
+  special-mode "Evolution"
+  "Major mode for doing evolution.
+\\{evolution-mode-map}"
+  :group "Evolution"
+  (define-key evolution-mode-map (kbd "SPC") 'evolution-draw-patterns)
+  (define-key evolution-mode-map [down-mouse-3] 'evolution-function)
+  )
+
+;;;; insert colored and/or bright text
+(defun insert-colored-text (str clr bright)
+  "Inserts str at point, in color clr, bright or not."
+  (interactive (list (read-string " String: ")
+                     (read-string " Color: ")
+                     (y-or-n-p    " Bright? ") ))
+  (insert (propertize str 'font-lock-face
+                      `(:weight ,(if bright 'bold 'normal) :foreground ,clr) )))
+
+(defalias 'insertc 'insert-colored-text)
+
+(defvar *width* 80)
+(defvar *height* 30)
+(defvar *jungle* '(45 10 10 10))
+(defvar *plant-energy* 80)
+
+(defvar *plants* (make-hash-table :test #'equal))
 
 (defun random-plant (left top width height)
   (let ((pos (cons (+ left (random width)) (+ top (random height)))))
@@ -15,7 +43,7 @@
 
 (defstruct animal x y energy dir genes)
 
-(defparameter *animals*
+(defvar *animals*
   (list (make-animal :x      (ash *width* -1)
                      :y      (ash *height* -1)
                      :energy 1000
@@ -63,7 +91,7 @@
       (incf (animal-energy animal) *plant-energy*)
       (remhash pos *plants*))))
 
-(defparameter *reproduction-energy* 200)
+(defvar *reproduction-energy* 200)
 
 (defun reproduce (animal)
   (let ((e (animal-energy animal)))

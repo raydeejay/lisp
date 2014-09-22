@@ -1,5 +1,23 @@
 ;; evolution.el -- the evolution demo, ported to EmacsLisp
 
+(defvar evolution-width 80)
+(defvar evolution-height 30)
+(defvar evolution-jungle-rectangle '(45 10 10 10))
+(defvar evolution-plant-energy 80)
+
+(defvar evolution-plants (make-hash-table :test #'equal))
+
+(defvar evolution-animals
+  (list (make-animal :x      (ash evolution-width -1)
+                     :y      (ash evolution-height -1)
+                     :energy 1000
+                     :dir    0
+                     :genes (loop repeat 8
+                                  collecting (1+ (random 10))))))
+
+(defvar evolution-reproduction-energy 200)
+
+;; major mode things
 (defun evolution ()
   (interactive)
   (switch-to-buffer "*evolution*")
@@ -26,30 +44,15 @@
 
 (defalias 'insertc 'insert-colored-text)
 
-(defvar *width* 80)
-(defvar *height* 30)
-(defvar *jungle* '(45 10 10 10))
-(defvar *plant-energy* 80)
-
-(defvar *plants* (make-hash-table :test #'equal))
-
 (defun random-plant (left top width height)
   (let ((pos (cons (+ left (random width)) (+ top (random height)))))
-    (setf (gethash pos *plants*) t)))
+    (setf (gethash pos evolution-plants) t)))
 
 (defun add-plants ()
-  (apply 'random-plant *jungle*)
-  (random-plant 0 0 *width* *height*))
+  (apply 'random-plant evolution-jungle-rectangle)
+  (random-plant 0 0 evolution-width evolution-height))
 
 (defstruct animal x y energy dir genes)
-
-(defvar *animals*
-  (list (make-animal :x      (ash *width* -1)
-                     :y      (ash *height* -1)
-                     :energy 1000
-                     :dir    0
-                     :genes (loop repeat 8
-                                  collecting (1+ (random 10))))))
 
 (defun move (animal)
   (let ((dir (animal-dir animal))
@@ -60,16 +63,16 @@
                   (cond ((and (>= dir 2) (<= dir 4)) 1)
                         ((or (= dir 1) (= dir 5)) 0)
                         (t -1))
-                  *width*)
-               *width*))
+                  evolution-width)
+               evolution-width))
 
     (setf (animal-y animal)
           (mod (+ y
                   (cond ((and (>= dir 1) (<= dir 2)) -1)
                         ((or (= dir 3) (= dir 7)) 0)
                         (t 1))
-                  *height*)
-               *height*))
+                  evolution-height)
+               evolution-height))
 
     (decf (animal-energy animal))))
 
@@ -87,73 +90,50 @@
 
 (defun eat (animal)
   (let ((pos (cons (animal-x animal) (animal-y animal))))
-    (when (gethash pos *plants*)
-      (incf (animal-energy animal) *plant-energy*)
-      (remhash pos *plants*))))
-
-(defvar *reproduction-energy* 200)
+    (when (gethash pos evolution-plants)
+      (incf (animal-energy animal) evolution-plant-energy)
+      (remhash pos evolution-plants))))
 
 (defun reproduce (animal)
   (let ((e (animal-energy animal)))
-    (when (>= e *reproduction-energy*)
+    (when (>= e evolution-reproduction-energy)
       (setf (animal-energy animal) (ash e -1))
       (let ((animal-nu (copy-animal animal))
             (genes     (copy-list (animal-genes animal)))
             (mutation (random 8)))
         (setf (nth mutation genes) (max 1 (+ (nth mutation genes) (random 3) -1)))
         (setf (animal-genes animal) genes)
-        (push animal-nu *animals*)))))
+        (push animal-nu evolution-animals)))))
 
 (defun update-world ()
-  (setf *animals* (remove-if (lambda (animal)
+  (setf evolution-animals (remove-if (lambda (animal)
                                (<= (animal-energy animal) 0))
-                             *animals*))
+                             evolution-animals))
   (mapc (lambda (animal)
           (turn animal)
           (move animal)
           (eat animal)
           (reproduce animal))
-        *animals*)
+        evolution-animals)
   (add-plants))
 
 (defun draw-world ()
   (erase-buffer)
   (loop for y
-        below *height*
+        below evolution-height
         do (progn (newline)
-                  (insert "|")
+                  (insertc "|" "green" nil)
                   (loop for x
-                        below *width*
+                        below evolution-width
                         do (insert (cond ((some (lambda (animal)
                                                   (and (= (animal-x animal) x)
                                                        (= (animal-y animal) y)))
-                                                *animals*)
+                                                evolution-animals)
                                           ?M )
-                                         ((gethash (cons x y) *plants*) ?\* )
+                                         ((gethash (cons x y) evolution-plants) ?\* )
                                          (t ?\s ))))
-                  (insert "|")))
+                  (insertc "|" "green" nil)))
   (redisplay t))
-
-(defun draw-border ()
-  (loop for y
-        below *height*
-        do (progn (newline)
-                  (insert "|")
-                  (loop for x
-                        below *width*
-                        do (insert (cond ((some (lambda (animal)
-                                                  (and (= (animal-x animal) x)
-                                                       (= (animal-y animal) y)))
-                                                *animals*)
-                                          ?M )
-                                         ((gethash (cons x y) *plants*) ?\* )
-                                         (t ?\s ))))
-                  (insert "|")))
-  (redisplay t))
-
-(defun draw-plants ())
-
-(defun draw-animals ())
 
 (defun evolution ()
   (interactive)

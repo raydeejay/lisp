@@ -38,7 +38,7 @@
     (setf (gethash pos *plants*) t)))
 
 (defun add-plants ()
-  (apply #'random-plant *jungle*)
+  (apply 'random-plant *jungle*)
   (random-plant 0 0 *width* *height*))
 
 (defstruct animal x y energy dir genes)
@@ -97,7 +97,7 @@
   (let ((e (animal-energy animal)))
     (when (>= e *reproduction-energy*)
       (setf (animal-energy animal) (ash e -1))
-      (let ((animal-nu (copy-structure animal))
+      (let ((animal-nu (copy-animal animal))
             (genes     (copy-list (animal-genes animal)))
             (mutation (random 8)))
         (setf (nth mutation genes) (max 1 (+ (nth mutation genes) (random 3) -1)))
@@ -117,6 +117,7 @@
   (add-plants))
 
 (defun draw-world ()
+  (erase-buffer)
   (loop for y
      below *height*
      do (progn (fresh-line)
@@ -134,8 +135,8 @@
 
 (defun evolution ()
   (draw-world)
-  (fresh-line)
-  (let ((str (read-line)))
+  (newline)
+  (let ((str (read-string "Steps (or 'quit'): ")))
     (cond ((equal str "quit") ())
           (t (let ((x (parse-integer str :junk-allowed t)))
                (if x

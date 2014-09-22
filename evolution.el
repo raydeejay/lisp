@@ -7,7 +7,10 @@
 
 (defvar evolution-plants (make-hash-table :test #'equal))
 
-;; create an initial animal, centered, with random genes
+;; Create an initial animal, centered, with random genes.
+;;
+;; The genes determine the likelihood of the animal going in a certain
+;; direction
 (defvar evolution-animals
   (list (make-animal :x      (ash evolution-width -1)
                      :y      (ash evolution-height -1)
@@ -16,8 +19,10 @@
                      :genes  (loop repeat 8
                                    collecting (1+ (random 10))))))
 
+;; minimum energy required to reproduce
 (defvar evolution-reproduction-energy 200)
 
+;; customizable colors
 (defvar evolution-fence-color "yellow")
 
 ;; major mode things

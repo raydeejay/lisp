@@ -23,7 +23,8 @@
   (interactive)
   (switch-to-buffer "*evolution-game*")
   (evolution-mode)
-  (font-lock-mode))
+  (font-lock-mode)
+  (evolution-start))
 
 (define-derived-mode evolution-mode
   special-mode "Evolution"
@@ -133,7 +134,8 @@
                   (insertc "|" "brown" nil)))
   (redisplay t))
 
-(defun evolution ()
+(defun evolution-start ()
+(let ((inhibit-read-only t))
   (interactive)
   (draw-world)
   (newline)
@@ -145,5 +147,5 @@
                          below x
                          do (update-world)
                          (draw-world))
-                 (evolution)))))))
+                 (evolution))))))))
 

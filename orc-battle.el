@@ -149,7 +149,6 @@
 
 (defclass orc (monster) ((club-level (randval 8)))
   "An orc")
-;;(defun make-orc () (make-instance 'orc))
 (push 'orc orc-battle-monster-builders)
 
 (defmethod monster-show ((m orc))
@@ -157,7 +156,7 @@
   (insert (int-to-string (orc-club-level m)))
   (insert " club"))
 
-(defun monster-attack ((m orc))
+(defmethod monster-attack ((m orc))
   (let ((x (randval (orc-club-level m))))
        (insert "An orc swings his club at you and knocks off ")
        (insert (int-to-string x))
@@ -166,7 +165,6 @@
 
 (defclass hydra (monster) nil
   "An hydra")
-;;(defun make-hydra () (make-instance 'hydra))
 (push 'hydra orc-battle-monster-builders)
 
 (defmethod monster-show ((m hydra))
@@ -193,7 +191,6 @@ falls to the floor!")
 
 (defclass slime-mold (monster) ((sliminess (randval 5)))
   "A slime mold")
-;;(defun make-slime-mold () (make-instance 'slime-mold))
 (push 'slime-mold orc-battle-monster-builders)
 
 (defmethod monster-show ((m slime-mold))
@@ -213,7 +210,6 @@ by ")
 
 (defclass brigand (monster) nil
   "A brigand")
-;;(defun make-brigand () (make-instance 'brigand))
 (push 'brigand orc-battle-monster-builders)
 
 (defmethod monster-attack ((m brigand))

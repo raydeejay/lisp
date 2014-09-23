@@ -28,15 +28,22 @@
 (defun randval (n)
   (1+ (random (max 1 n))))
 
+;; command
 (defun orc-battle ()
   (interactive)
-  (init-monsters)
-  (init-player)
+  (switch-to-buffer "*orc-battle*")
+  ;; ;; the game looks terrible with this on :/
+  ;;  (electric-indent-mode -1)
+  (orc-battle-init)
   (game-loop)
   (when (player-dead)
     (insert "You have been killed. Game Over."))
   (when (monsters-dead)
     (insert "Congratulations! You have vanquished all of your foes.")))
+
+(defun orc-battle-init ()
+  (init-monsters)
+  (init-player))
 
 (defun game-loop ()
   (unless (or (player-dead) (monsters-dead))

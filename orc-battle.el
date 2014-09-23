@@ -29,7 +29,6 @@
     (insert "Congratulations! You have vanquished all of your foes.")))
 
 (defun game-loop ()
-  (insert "----------")
   (unless (or (player-dead) (monsters-dead))
     (show-player)
     (dotimes (k (1+ (truncate (/ (max 0 orc-battle-player-agility) 15))))
@@ -97,7 +96,7 @@
               m)))))
 
 (defun init-monsters ()
-  (setf orc-battle-monsters
+  (setq orc-battle-monsters
         (map 'vector
              (lambda (x)
                (funcall (nth (random (length orc-battle-monster-builders))
@@ -110,9 +109,7 @@
   (every 'monster-dead orc-battle-monsters))
 
 (defmethod monster-health (m)
-  (cond ((slot-boundp m 'health)
-         (oref m 'health))
-        (t 0)))
+  (oref m health))
 
 (defun show-monsters ()
   (newline)
@@ -132,38 +129,38 @@
                          (monster-show m))))
          orc-battle-monsters)))
 
-(defclass monster nil ((health (randval 10)))
+(defclass monster nil ((health :initform (randval 10)))
   "A monster")
 
 (defmethod monster-hit (m x)
-  (decf (oref m 'health) x)
+  (decf (oref m health) x)
   (if (monster-dead m)
       (progn (insert "You killed the ")
-             (insert (type-of m))
+             (insert (symbol-name (object-class m)))
              (insert "! "))
       (progn (insert "You hit the ")
-             (insert (type-of m))
+             (insert (symbol-name (object-class m)))
              (insert ", knocking off ")
              (insert (int-to-string x))
              (insert " health points! "))))
 
 (defmethod monster-show (m)
   (insert "A fierce ")
-  (insert (type-of m)))
+  (insert (symbol-name (object-class m))))
 
 (defmethod monster-attack (m))
 
-(defclass orc (monster) ((club-level (randval 8)))
+(defclass orc (monster) ((club-level :initform (randval 8)))
   "An orc")
 (push 'orc orc-battle-monster-builders)
 
 (defmethod monster-show ((m orc))
   (insert "A wicked orc with a level ")
-  (insert (int-to-string (orc-club-level m)))
+  (insert (int-to-string (oref m club-level)))
   (insert " club"))
 
 (defmethod monster-attack ((m orc))
-  (let ((x (randval (orc-club-level m))))
+  (let ((x (randval (oref m club-level))))
        (insert "An orc swings his club at you and knocks off ")
        (insert (int-to-string x))
        (insert " of your health points. ")
@@ -179,7 +176,7 @@
   (insert " heads."))
 
 (defmethod monster-hit ((m hydra) x)
-  (decf (oref m 'health) x)
+  (decf (oref m health) x)
   (if (monster-dead m)
       (insert "The corpse of the fully decapitated and decapacitated hydra
 falls to the floor!")
@@ -192,19 +189,19 @@ falls to the floor!")
     (insert "A hydra attacks you with ")
     (insert (int-to-string x))
     (insert " of its heads! It also grows back one more head! ")
-    (incf (oref m 'health))
+    (incf (oref m health))
     (decf orc-battle-player-health x)))
 
-(defclass slime-mold (monster) ((sliminess (randval 5)))
+(defclass slime-mold (monster) ((sliminess :initform (randval 5)))
   "A slime mold")
 (push 'slime-mold orc-battle-monster-builders)
 
 (defmethod monster-show ((m slime-mold))
   (insert "A slime mold with a sliminess of ")
-  (insert (int-to-string (slime-mold-sliminess m))))
+  (insert (int-to-string (oref m sliminess))))
 
 (defmethod monster-attack ((m slime-mold))
-  (let ((x (randval (slime-mold-sliminess m))))
+  (let ((x (randval (oref m sliminess))))
        (insert "A slime mold wraps around your legs and decreases your agility
 by ")
        (insert (int-to-string x))

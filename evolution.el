@@ -3,7 +3,7 @@
 (defvar evolution-width 80)
 (defvar evolution-height 30)
 (defvar evolution-jungle-rectangle '(45 10 10 10))
-(defvar evolution-plant-energy 80)
+(defvar evolution-plant-energy 20)
 
 (defvar evolution-plants (make-hash-table :test #'equal))
 
@@ -14,7 +14,7 @@
 (defvar evolution-animals
   (list (make-animal :x      (ash evolution-width -1)
                      :y      (ash evolution-height -1)
-                     :energy 1000
+                     :energy 400
                      :dir    0
                      :genes  (loop repeat 8
                                    collecting (1+ (random 10))))))
@@ -35,10 +35,11 @@
 
 (define-derived-mode evolution-mode
   special-mode "Evolution"
-  "Major mode for doing evolution.
+  "Major mode for playing the evolution game.
 \\{evolution-mode-map}"
   :group "Evolution"
-  (define-key evolution-mode-map (kbd "SPC") 'evolution-start))
+  (define-key evolution-mode-map (kbd "SPC") 'evolution-function)
+  (define-key evolution-mode-map (kbd "n") 'evolution-start))
 
 ;;;; insert colored and/or bright text
 (defun insert-colored-text (str clr bright)

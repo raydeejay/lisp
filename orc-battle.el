@@ -1,3 +1,5 @@
+(require 'eieio)
+
 (defvar orc-battle-player-health nil)
 (defvar orc-battle-player-agility nil)
 (defvar orc-battle-player-strength nil)
@@ -5,6 +7,10 @@
 (defvar orc-battle-monsters nil)
 (defvar orc-battle-monster-builders nil)
 (defvar orc-battle-monster-num 12)
+
+;; helper
+(defun randval (n)
+  (1+ (random (max 1 n))))
 
 (defun orc-battle ()
   (interactive)
@@ -17,6 +23,7 @@
     (insert "Congratulations! You have vanquished all of your foes.")))
 
 (defun game-loop ()
+  (insert "----------")
   (unless (or (player-dead) (monsters-dead))
     (show-player)
     (dotimes (k (1+ (truncate (/ (max 0 orc-battle-player-agility) 15))))
@@ -31,9 +38,9 @@
     (game-loop)))
 
 (defun init-player ()
-  (setf orc-battle-player-health 30)
-  (setf orc-battle-player-agility 30)
-  (setf orc-battle-player-strength 30))
+  (setq orc-battle-player-health 30)
+  (setq orc-battle-player-agility 30)
+  (setq orc-battle-player-strength 30))
 
 (defun player-dead ()
   (<= orc-battle-player-health 0))
@@ -41,11 +48,11 @@
 (defun show-player ()
   (newline)
   (insert "You are a valiant knight with a health of ")
-  (insert orc-battle-player-health)
+  (insert (int-to-string orc-battle-player-health))
   (insert ", an agility of ")
-  (insert orc-battle-player-agility)
+  (insert (int-to-string orc-battle-player-agility))
   (insert ", and a strength of ")
-  (insert orc-battle-player-strength))
+  (insert (int-to-string orc-battle-player-strength)))
 
 (defun player-attack ()
   (newline)
@@ -88,13 +95,18 @@
         (map 'vector
              (lambda (x)
                (funcall (nth (random (length orc-battle-monster-builders))
-                         orc-battle-monster-builders)))
-             (make-array orc-battle-monster-num))))
+                         orc-battle-monster-builders) "monster"))
+             (make-vector orc-battle-monster-num nil))))
 
-(defun monster-dead (m)
+(defmethod monster-dead (m)
   (<= (monster-health m) 0))
 (defun monsters-dead ()
   (every 'monster-dead orc-battle-monsters))
+
+(defmethod monster-health (m)
+  (cond ((slot-boundp m 'health)
+         (oref m 'health))
+        (t 0)))
 
 (defun show-monsters ()
   (newline)
@@ -104,20 +116,21 @@
          (lambda (m)
              (newline)
              (insert "    ")
-             (insert (incf x))
+             (insert (int-to-string (incf x)))
              (insert ". ")
              (if (monster-dead m)
                  (insert "**dead**")
                  (progn (insert "(Health=")
-                         (insert (monster-health m))
+                         (insert (int-to-string (monster-health m)))
                          (insert ") ")
                          (monster-show m))))
          orc-battle-monsters)))
 
-(defclass monster nil ((health (randval 10))))
+(defclass monster nil ((health (randval 10)))
+  "A monster")
 
 (defmethod monster-hit (m x)
-  (decf (monster-health m) x)
+  (decf (oref m 'health) x)
   (if (monster-dead m)
       (progn (insert "You killed the ")
              (insert (type-of m))
@@ -125,7 +138,7 @@
       (progn (insert "You hit the ")
              (insert (type-of m))
              (insert ", knocking off ")
-             (insert x)
+             (insert (int-to-string x))
              (insert " health points! "))))
 
 (defmethod monster-show (m)
@@ -134,66 +147,74 @@
 
 (defmethod monster-attack (m))
 
-(defclass orc (monster) ((club-level (randval 8))))
-(push 'make-orc orc-battle-monster-builders)
+(defclass orc (monster) ((club-level (randval 8)))
+  "An orc")
+;;(defun make-orc () (make-instance 'orc))
+(push 'orc orc-battle-monster-builders)
 
 (defmethod monster-show ((m orc))
   (insert "A wicked orc with a level ")
-  (insert (orc-club-level m))
+  (insert (int-to-string (orc-club-level m)))
   (insert " club"))
 
-(defmethod monster-attack ((m orc))
+(defun monster-attack ((m orc))
   (let ((x (randval (orc-club-level m))))
        (insert "An orc swings his club at you and knocks off ")
-       (insert x)
+       (insert (int-to-string x))
        (insert " of your health points. ")
        (decf orc-battle-player-health x)))
 
-(defclass hydra (monster) ())
-(push 'make-hydra orc-battle-monster-builders)
+(defclass hydra (monster) nil
+  "An hydra")
+;;(defun make-hydra () (make-instance 'hydra))
+(push 'hydra orc-battle-monster-builders)
 
 (defmethod monster-show ((m hydra))
   (insert "A malicious hydra with ")
-  (insert (monster-health m))
+  (insert (int-to-string (monster-health m)))
   (insert " heads."))
 
 (defmethod monster-hit ((m hydra) x)
-  (decf (monster-health m) x)
+  (decf (oref m 'health) x)
   (if (monster-dead m)
       (insert "The corpse of the fully decapitated and decapacitated hydra
 falls to the floor!")
       (progn (insert "You lop off ")
-              (insert x)
+              (insert (int-to-string x))
               (insert " of the hydra's heads! "))))
 
 (defmethod monster-attack ((m hydra))
   (let ((x (randval (ash (monster-health m) -1))))
     (insert "A hydra attacks you with ")
-    (insert x)
+    (insert (int-to-string x))
     (insert " of its heads! It also grows back one more head! ")
-    (incf (monster-health m))
+    (incf (oref m 'health))
     (decf orc-battle-player-health x)))
 
-(defclass slime-mold (monster) ((sliminess (randval 5))))
-(push 'make-slime-mold orc-battle-monster-builders)
+(defclass slime-mold (monster) ((sliminess (randval 5)))
+  "A slime mold")
+;;(defun make-slime-mold () (make-instance 'slime-mold))
+(push 'slime-mold orc-battle-monster-builders)
 
 (defmethod monster-show ((m slime-mold))
   (insert "A slime mold with a sliminess of ")
-  (insert (slime-mold-sliminess m)))
+  (insert (int-to-string (slime-mold-sliminess m))))
 
 (defmethod monster-attack ((m slime-mold))
   (let ((x (randval (slime-mold-sliminess m))))
        (insert "A slime mold wraps around your legs and decreases your agility
 by ")
-       (insert x)
+       (insert (int-to-string x))
        (insert "! ")
        (decf orc-battle-player-agility x)
        (when (zerop (random 2))
          (insert "It also squirts in your face, taking away a health point! ")
          (decf orc-battle-player-health))))
 
-(defclass brigand (monster) ())
-(push 'make-brigand orc-battle-monster-builders)
+(defclass brigand (monster) nil
+  "A brigand")
+;;(defun make-brigand () (make-instance 'brigand))
+(push 'brigand orc-battle-monster-builders)
 
 (defmethod monster-attack ((m brigand))
   (let ((x (max orc-battle-player-health orc-battle-player-agility orc-battle-player-strength)))

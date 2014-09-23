@@ -74,7 +74,8 @@
   (insert ", an agility of ")
   (insert (int-to-string orc-battle-player-agility))
   (insert ", and a strength of ")
-  (insert (int-to-string orc-battle-player-strength)))
+  (insert (int-to-string orc-battle-player-strength))
+  (newline))
 
 (defun player-attack ()
   (newline)
@@ -154,12 +155,14 @@
   (if (monster-dead m)
       (progn (insert "You killed the ")
              (insert (symbol-name (object-class m)))
-             (insert "! "))
+             (insert "! ")
+             (newline))
       (progn (insert "You hit the ")
              (insert (symbol-name (object-class m)))
              (insert ", knocking off ")
              (insert (int-to-string x))
-             (insert " health points! "))))
+             (insert " health points! ")
+             (newline))))
 
 (defmethod monster-show (m)
   (insert "A fierce ")
@@ -181,6 +184,7 @@
        (insert "An orc swings his club at you and knocks off ")
        (insert (int-to-string x))
        (insert " of your health points. ")
+       (newline)
        (decf orc-battle-player-health x)))
 
 (defclass hydra (monster) nil
@@ -195,17 +199,20 @@
 (defmethod monster-hit ((m hydra) x)
   (decf (oref m health) x)
   (if (monster-dead m)
-      (insert "The corpse of the fully decapitated and decapacitated hydra
+      (progn (insert "The corpse of the fully decapitated and decapacitated hydra
 falls to the floor!")
-      (progn (insert "You lop off ")
-              (insert (int-to-string x))
-              (insert " of the hydra's heads! "))))
+             (newline))
+    (progn (insert "You lop off ")
+           (insert (int-to-string x))
+           (insert " of the hydra's heads! ")
+           (newline))))
 
 (defmethod monster-attack ((m hydra))
   (let ((x (randval (ash (monster-health m) -1))))
     (insert "A hydra attacks you with ")
     (insert (int-to-string x))
     (insert " of its heads! It also grows back one more head! ")
+    (newline)
     (incf (oref m health))
     (decf orc-battle-player-health x)))
 
@@ -223,9 +230,11 @@ falls to the floor!")
 by ")
        (insert (int-to-string x))
        (insert "! ")
+       (newline)
        (decf orc-battle-player-agility x)
        (when (zerop (random 2))
          (insert "It also squirts in your face, taking away a health point! ")
+         (newline)
          (decf orc-battle-player-health))))
 
 (defclass brigand (monster) nil
@@ -237,13 +246,16 @@ by ")
     (cond ((= x orc-battle-player-health)
            (insert "A brigand hits you with his slingshot, taking off 2 health
 points! ")
+           (newline)
            (decf orc-battle-player-health 2))
           ((= x orc-battle-player-agility)
            (insert "A brigand catches your leg with his whip, taking off 2
 agility points! ")
+           (newline)
            (decf orc-battle-player-agility 2))
           ((= x orc-battle-player-strength)
            (insert "A brigand cuts your arm with his whip, taking off 2
 strength points! ")
+           (newline)
            (decf orc-battle-player-strength 2)))))
 

@@ -1,16 +1,34 @@
 ;; evolution.el -- the evolution demo, ported to EmacsLisp
 
+;; where to go from here:
+;; - terrain
+;; - different types of creature
+;; - more stats
+;; - faster drawing
+
+;; size of the field
 (defvar evolution-width 80)
 (defvar evolution-height 30)
+
+;; size of the jungle
 (defvar evolution-jungle-rectangle '(45 10 10 10))
 (defvar evolution-plant-energy 20)
 
+;; minimum energy required to reproduce
+(defvar evolution-reproduction-energy 200)
+
+;; customizable colors
+(defvar evolution-fence-color "yellow")
+
+;; hash holding coordinates of the plants
 (defvar evolution-plants (make-hash-table :test #'equal))
 
-;; Create an initial animal, centered, with random genes.
-;;
+;; Animals
 ;; The genes determine the likelihood of the animal going in a certain
 ;; direction
+(defstruct animal x y energy dir genes)
+
+;; Create an initial animal, centered, with random genes.
 (defvar evolution-animals
   (list (make-animal :x      (ash evolution-width -1)
                      :y      (ash evolution-height -1)
@@ -19,14 +37,9 @@
                      :genes  (loop repeat 8
                                    collecting (1+ (random 10))))))
 
-;; minimum energy required to reproduce
-(defvar evolution-reproduction-energy 200)
-
-;; customizable colors
-(defvar evolution-fence-color "yellow")
-
 ;; major mode things
 (defun evolution ()
+  "Starts the evolution game."
   (interactive)
   (switch-to-buffer "*evolution-game*")
   (evolution-mode)
@@ -59,8 +72,6 @@
 (defun add-plants ()
   (apply 'random-plant evolution-jungle-rectangle)
   (random-plant 0 0 evolution-width evolution-height))
-
-(defstruct animal x y energy dir genes)
 
 (defun move (animal)
   (let ((dir (animal-dir animal))
@@ -112,50 +123,73 @@
         (push animal-nu evolution-animals)))))
 
 (defun update-world ()
+  (incf evolution-generation)
   (setf evolution-animals (remove-if (lambda (animal)
                                        (<= (animal-energy animal) 0))
                                      evolution-animals))
+  (add-plants)
   (mapc (lambda (animal)
           (turn animal)
           (move animal)
           (eat animal)
           (reproduce animal))
-        evolution-animals)
-  (add-plants))
+        evolution-animals))
 
 (defun animal-color (a)
-  (let ((color (max a 255)))
-    (format "#00%X00" color)))
+  (let ((color (min (animal-energy a) 255)))
+    (format "#%2X0000" color)))
+
+;; current generation
+(defvar evolution-generation 0)
 
 (defun draw-world ()
-  (erase-buffer)
-  (loop for y
-        below evolution-height
-        do (progn (newline)
-                  (insertc "|" evolution-fence-color nil)
-                  (loop for x
-                        below evolution-width
-                        do (cond ((some (lambda (animal)
-                                          (and (= (animal-x animal) x)
-                                               (= (animal-y animal) y)))
-                                        evolution-animals)
-                                  (insertc "m" (animal-color animal) nil))
-                                 ((gethash (cons x y) evolution-plants)
-                                  (insertc "*" "green" nil))
-                                 (t (insertc " " "darkgrey" nil))))
-                  (insertc "|" evolution-fence-color nil)))
-  (newline)
-  (insert (format "Animals: %d -- Plants: %d"
-                  (length evolution-animals)
-                  (hash-table-count evolution-plants)
-                  0))
-  (redisplay t))
+  (let ((inhibit-read-only t))
+    (erase-buffer)
+    (loop for y
+          below evolution-height
+          do (progn (newline)
+                    (insertc "|" evolution-fence-color nil)
+                    (let ((anml nil))
+                      (loop for x
+                            below evolution-width
+                            do (cond ((some (lambda (animal)
+                                              (and (= (animal-x animal) x)
+                                                   (= (animal-y animal) y)
+                                                   (setq anml animal)))
+                                            evolution-animals)
+                                      (insertc "m" (animal-color anml) nil))
+                                     ((gethash (cons x y) evolution-plants)
+                                      (insertc "*" "green" nil))
+                                     (t (insertc " " "darkgrey" nil)))))
+                    (insertc "|" evolution-fence-color nil)))
+    (newline)
+    (insert (format "Generation %d || %d animals -- %d plants"
+                    evolution-generation
+                    (length evolution-animals)
+                    (hash-table-count evolution-plants)
+                    0))
+    (redisplay t)))
+
+(defun evolution-init ()
+  (setq evolution-animals
+        (list (make-animal :x      (ash evolution-width -1)
+                           :y      (ash evolution-height -1)
+                           :energy 1000
+                           :dir    0
+                           :genes  (loop repeat 8
+                                         collecting (1+ (random 10))))))
+  (setq evolution-plants (make-hash-table :test #'equal))
+  (setq evolution-generation 0))
 
 (defun evolution-start ()
   (interactive)
+  (evolution-init)
+  (draw-world)
+  (evolution-function))
+
+(defun evolution-function ()
+  (interactive)
   (let ((inhibit-read-only t))
-    (draw-world)
-    (newline)
     (let ((str (read-string "Steps (or 'quit'): ")))
       (cond ((equal str "quit") ())
             (t (let ((x (string-to-int str)))
@@ -164,5 +198,5 @@
                            below x
                            do (update-world)
                            (draw-world))
-                   (evolution))))))))
+                   (evolution-function))))))))
 

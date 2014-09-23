@@ -1,3 +1,9 @@
+;; orc-battle.el -- fight!
+
+;; make this a package
+;; add mode, keybindings, etc
+;; color!
+
 (require 'eieio)
 
 (defvar orc-battle-player-health nil)

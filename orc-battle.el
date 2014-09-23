@@ -14,7 +14,17 @@
 (defvar orc-battle-monster-builders nil)
 (defvar orc-battle-monster-num 12)
 
-;; helper
+;; helpers
+(defun insert-colored-text (str clr bright)
+  "Inserts str at point, in color clr, bright or not."
+  (interactive (list (read-string "String: ")
+                     (read-string "Color: ")
+                     (y-or-n-p    "Bright? ") ))
+  (insert (propertize str 'font-lock-face
+                      `(:weight ,(if bright 'bold 'normal) :foreground ,clr) )))
+
+(defalias 'insertc 'insert-colored-text)
+
 (defun randval (n)
   (1+ (random (max 1 n))))
 

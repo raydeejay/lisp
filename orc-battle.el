@@ -51,9 +51,9 @@
     (orc-battle-cycle)))
 
 (defun end-game ()
-  (when (player-dead)
+  (when (player-dead-p)
     (insertc "You have been killed. Game Over." "red" nil))
-  (when (monsters-dead)
+  (when (monsters-dead-p)
     (insertc "Congratulations! You have vanquished all of your foes." "green" t)))
 
 (define-derived-mode orc-battle-mode
@@ -79,7 +79,7 @@
 
 (defun phase-one ()
   (when (= orc-battle-player-current-turn 0) (phase-two))
-  (unless (or (monsters-dead) (player-dead))
+  (unless (or (monsters-dead-p) (player-dead-p))
     (show-monsters)
     (player-attack)
     (decf orc-battle-player-current-turn)
@@ -90,21 +90,21 @@
   (newline)
   (map 'list
        (lambda(m)
-         (or (monster-dead m) (monster-attack m)))
+         (or (monster-dead-p m) (monster-attack m)))
        orc-battle-monsters)
   (orc-battle-cycle))
 
 (defun game-loop ()
-  (unless (or (player-dead) (monsters-dead))
+  (unless (or (player-dead-p) (monsters-dead-p))
     (show-player)
     (dotimes (k (1+ (truncate (/ (max 0 orc-battle-player-agility) 15))))
-      (unless (monsters-dead)
+      (unless (monsters-dead-p)
         (show-monsters)
         (player-attack)))
     (newline)
     (map 'list
          (lambda(m)
-           (or (monster-dead m) (monster-attack m)))
+           (or (monster-dead-p m) (monster-attack m)))
          orc-battle-monsters)
     (game-loop)))
 
@@ -113,7 +113,7 @@
   (setq orc-battle-player-agility 30)
   (setq orc-battle-player-strength 30))
 
-(defun player-dead ()
+(defun player-dead-p ()
   (<= orc-battle-player-health 0))
 
 (defun show-player ()
@@ -140,14 +140,14 @@
     (insert (number-to-string x))
     (newline)
     (monster-hit (pick-monster) x)
-    (unless (monsters-dead)
+    (unless (monsters-dead-p)
       (monster-hit (pick-monster) x)))
   (phase-one))
 
 (defun player-roundhouse ()
   (interactive)
   (dotimes (x (1+ (randval (truncate (/ orc-battle-player-strength 3)))))
-    (unless (monsters-dead)
+    (unless (monsters-dead-p)
       (monster-hit (random-monster) 1)))
   (phase-one))
 
@@ -162,7 +162,7 @@
 
 (defun random-monster ()
   (let ((m (aref orc-battle-monsters (random (length orc-battle-monsters)))))
-    (if (monster-dead m)
+    (if (monster-dead-p m)
         (random-monster)
         m)))
 
@@ -176,7 +176,7 @@
                (insert "That is not a valid monster number.")
                (pick-monster))
         (let ((m (aref orc-battle-monsters (1- x))))
-          (if (monster-dead m)
+          (if (monster-dead-p m)
               (progn (newline)
                      (insert "That monster is already dead.")
                      (pick-monster))
@@ -190,8 +190,8 @@
                          orc-battle-monster-builders) "monster"))
              (make-vector orc-battle-monster-num nil))))
 
-(defun monsters-dead ()
-  (every 'monster-dead orc-battle-monsters))
+(defun monsters-dead-p ()
+  (every 'monster-dead-p orc-battle-monsters))
 
 (defun show-monsters ()
   (newline)
@@ -203,7 +203,7 @@
              (insert "    ")
              (insert (int-to-string (incf x)))
              (insert ". ")
-             (if (monster-dead m)
+             (if (monster-dead-p m)
                  (insertc "**dead**" "purple" nil)
                  (progn (insert "(Health=")
                          (insert (int-to-string (monster-health m)))
@@ -216,7 +216,7 @@
 (defclass monster nil ((health :initform (randval 10)))
   "A monster")
 
-(defmethod monster-dead (m)
+(defmethod monster-dead-p (m)
   (<= (monster-health m) 0))
 
 (defmethod monster-health (m)
@@ -224,7 +224,7 @@
 
 (defmethod monster-hit (m x)
   (decf (oref m health) x)
-  (if (monster-dead m)
+  (if (monster-dead-p m)
       (progn (insertc "You killed the " "green" nil)
              (insertc (symbol-name (object-class m)) "green" nil)
              (insertc "! " "green" nil)
@@ -272,7 +272,7 @@
 
 (defmethod monster-hit ((m hydra) x)
   (decf (oref m health) x)
-  (if (monster-dead m)
+  (if (monster-dead-p m)
       (progn (insert "The corpse of the fully decapitated and decapacitated hydra falls to the floor!")
              (newline))
     (progn (insert "You lop off ")

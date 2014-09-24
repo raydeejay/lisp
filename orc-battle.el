@@ -69,26 +69,34 @@
   (init-monsters)
   (init-player))
 
-(defun orc-battle-cycle ()
-    (show-player)
-    (setq orc-battle-player-turns
-          (1+ (truncate (/ (max 0 orc-battle-player-agility) 15))))
-    (setq orc-battle-player-current-turn
-          (1+ orc-battle-player-turns))
-    (phase-one))
+(defun orc-battle-take-turn ()
+  (if (or (monsters-dead-p) (player-dead-p))
+      (end-game)
+    (if (zerop orc-battle-player-current-turn)
+        (monster-turn)
+      (player-turn))))
 
-(defun phase-one ()
-  (when (= orc-battle-player-current-turn 0) (phase-two))
+(defun orc-battle-cycle ()
+  (insertc "A new round begins!" "cyan" nil)
+  (newline)
+  (setq orc-battle-player-turns
+        (1+ (truncate (/ (max 0 orc-battle-player-agility) 15))))
+  (setq orc-battle-player-current-turn
+        orc-battle-player-turns)
+  (show-player)
+  (orc-battle-take-turn))
+
+(defun player-turn ()
+  (decf orc-battle-player-current-turn)
   (unless (or (monsters-dead-p) (player-dead-p))
     (show-monsters)
     (newline)
-    (decf orc-battle-player-current-turn)
     (insert "Attack style: [s]tab [d]ouble swing [r]oundhouse:")
     (newline)
     (recenter -2))
   (newline))
 
-(defun phase-two ()
+(defun monster-turn ()
   (newline)
   (map 'list
        (lambda(m)
@@ -130,7 +138,7 @@
   (interactive)
   (monster-hit (pick-monster)
                (+ 2 (randval (ash orc-battle-player-strength -1))))
-  (phase-one))
+  (orc-battle-take-turn))
 
 (defun attack-double-swing ()
   (interactive)
@@ -142,14 +150,14 @@
     (monster-hit (pick-monster) x)
     (unless (monsters-dead-p)
       (monster-hit (pick-monster) x)))
-  (phase-one))
+  (orc-battle-take-turn))
 
 (defun attack-roundhouse ()
   (interactive)
   (dotimes (x (1+ (randval (truncate (/ orc-battle-player-strength 3)))))
     (unless (monsters-dead-p)
       (monster-hit (random-monster) 1)))
-  (phase-one))
+  (orc-battle-take-turn))
 
 (defun random-monster ()
   (let ((m (aref orc-battle-monsters (random (length orc-battle-monsters)))))

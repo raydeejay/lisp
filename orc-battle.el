@@ -49,7 +49,7 @@
     (when (player-dead)
       (insertc "You have been killed. Game Over." "red" nil))
     (when (monsters-dead)
-      (insertc "Congratulations! You have vanquished all of your foes." "cyan" t))))
+      (insertc "Congratulations! You have vanquished all of your foes." "green" t))))
 
 (define-derived-mode orc-battle-mode
   special-mode "Orc Battle"
@@ -104,7 +104,7 @@
                     (+ 2 (randval (ash orc-battle-player-strength -1)))))
     (d (let ((x (randval (truncate (/ orc-battle-player-strength 6)))))
          (insert "Your double swing has a strength of ")
-         (insert x)
+         (insert ((int-to-string x))
          (newline)
          (monster-hit (pick-monster) x)
          (unless (monsters-dead)

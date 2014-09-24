@@ -50,12 +50,6 @@
   (let ((inhibit-read-only t))
     (orc-battle-cycle)))
 
-(defun end-game ()
-  (when (player-dead-p)
-    (insertc "You have been killed. Game Over." "red" nil))
-  (when (monsters-dead-p)
-    (insertc "Congratulations! You have vanquished all of your foes." "green" t)))
-
 (define-derived-mode orc-battle-mode
   special-mode "Orc Battle"
   "Major mode for playing the orc-battle game.
@@ -96,19 +90,11 @@
        orc-battle-monsters)
   (orc-battle-cycle))
 
-(defun game-loop ()
-  (unless (or (player-dead-p) (monsters-dead-p))
-    (show-player)
-    (dotimes (k (1+ (truncate (/ (max 0 orc-battle-player-agility) 15))))
-      (unless (monsters-dead-p)
-        (show-monsters)
-        (player-attack)))
-    (newline)
-    (map 'list
-         (lambda(m)
-           (or (monster-dead-p m) (monster-attack m)))
-         orc-battle-monsters)
-    (game-loop)))
+(defun end-game ()
+  (when (player-dead-p)
+    (insertc "You have been killed. Game Over." "red" nil))
+  (when (monsters-dead-p)
+    (insertc "Congratulations! You have vanquished all of your foes." "green" t)))
 
 (defun init-player ()
   (setq orc-battle-player-health 30)

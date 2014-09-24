@@ -61,9 +61,9 @@
   "Major mode for playing the orc-battle game.
 \\{orc-battle-mode-map}"
   :group "Orc-Battle"
-  (define-key orc-battle-mode-map (kbd "s") 'player-stab)
-  (define-key orc-battle-mode-map (kbd "d") 'player-double-swing)
-  (define-key orc-battle-mode-map (kbd "r") 'player-roundhouse))
+  (define-key orc-battle-mode-map (kbd "s") 'attack-stab)
+  (define-key orc-battle-mode-map (kbd "d") 'attack-double-swing)
+  (define-key orc-battle-mode-map (kbd "r") 'attack-roundhouse))
 
 (defun orc-battle-init ()
   (init-monsters)
@@ -126,13 +126,13 @@
   (insert (int-to-string orc-battle-player-strength))
   (newline))
 
-(defun player-stab ()
+(defun attack-stab ()
   (interactive)
   (monster-hit (pick-monster)
                (+ 2 (randval (ash orc-battle-player-strength -1))))
   (phase-one))
 
-(defun player-double-swing ()
+(defun attack-double-swing ()
   (interactive)
   (let ((x (randval (truncate (/ orc-battle-player-strength 6)))))
     (newline)
@@ -144,7 +144,7 @@
       (monster-hit (pick-monster) x)))
   (phase-one))
 
-(defun player-roundhouse ()
+(defun attack-roundhouse ()
   (interactive)
   (dotimes (x (1+ (randval (truncate (/ orc-battle-player-strength 3)))))
     (unless (monsters-dead-p)

@@ -6,6 +6,9 @@
 (defparameter *monster-builders* nil)
 (defparameter *monster-num* 12)
 
+(defun randval (n)
+  (1+ (random (max 1 n))))
+
 (defun orc-battle ()
   (init-monsters)
   (init-player)

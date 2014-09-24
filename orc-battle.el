@@ -41,14 +41,24 @@
 (defun orc-battle ()
   (interactive)
   (switch-to-buffer "*orc-battle*")
-  ;; ;; the game looks terrible with this on :/
-  ;;  (electric-indent-mode -1)
+  (orc-battle-mode)
+  (font-lock-mode)
   (orc-battle-init)
-  (game-loop)
-  (when (player-dead)
-    (insert "You have been killed. Game Over."))
-  (when (monsters-dead)
-    (insert "Congratulations! You have vanquished all of your foes.")))
+  (let ((inhibit-read-only t))
+    (game-loop)
+    (when (player-dead)
+      (insertc "You have been killed. Game Over." "red" nil))
+    (when (monsters-dead)
+      (insertc "Congratulations! You have vanquished all of your foes." "cyan" t))))
+
+(define-derived-mode orc-battle-mode
+  special-mode "Orc Battle"
+  "Major mode for playing the orc-battle game.
+\\{orc-battle-mode-map}"
+  :group "Orc-Battle"
+;;  (define-key orc-battle-mode-map (kbd "SPC") 'orc-battle-function)
+;;  (define-key orc-battle-mode-map (kbd "n") 'orc-battle-start)
+  )
 
 (defun orc-battle-init ()
   (init-monsters)

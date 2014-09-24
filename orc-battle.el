@@ -105,7 +105,10 @@
 (defun init-player ()
   (setq orc-battle-player-health 30)
   (setq orc-battle-player-agility 30)
-  (setq orc-battle-player-strength 30))
+  (setq orc-battle-player-strength 30)
+  (setq orc-battle-player-class
+        (nth (1+ (random (length orc-battle-player-classes)))
+             orc-battle-player-classes)))
 
 (defun player-dead-p ()
   (<= orc-battle-player-health 0))

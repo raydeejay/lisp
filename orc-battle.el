@@ -22,6 +22,8 @@
 (defvar orc-battle-monsters nil)
 (defvar orc-battle-monster-builders nil)
 (defvar orc-battle-monster-num 12)
+(defvar orc-battle-player-turns 0)
+(defvar orc-battle-player-current-turn 0)
 
 ;; helpers
 (defun insert-colored-text (str clr bright)
@@ -46,7 +48,7 @@
   (read-only-mode -1)
   (orc-battle-init)
   (let ((inhibit-read-only t))
-    (phase-one)))
+    (orc-battle-cycle)))
 
 (defun end-game ()
   (when (player-dead)
@@ -69,12 +71,19 @@
   (init-monsters)
   (init-player))
 
+(defun orc-battle-cycle ()
+    (show-player)
+    (setq orc-battle-player-turns (1+ (truncate (/ (max 0 orc-battle-player-agility) 15))))
+    (setq orc-battle-player-current-turn (1+ orc-battle-player-turns))
+    (phase-one))
+
 (defun phase-one ()
-  (show-player)
-  (dotimes (k (1+ (truncate (/ (max 0 orc-battle-player-agility) 15))))
-    (unless (monsters-dead)
-      (show-monsters)
-      (player-attack)))
+  (when (= orc-battle-player-current-turn 0) (phase-two))
+  (unless (or (monsters-dead) (player-dead))
+    (show-monsters)
+    (player-attack)
+    (decf orc-battle-player-current-turn)
+    (recenter -2))
   (newline))
 
 (defun phase-two ()
@@ -83,7 +92,7 @@
        (lambda(m)
          (or (monster-dead m) (monster-attack m)))
        orc-battle-monsters)
-  (phase-one))
+  (orc-battle-cycle))
 
 (defun game-loop ()
   (unless (or (player-dead) (monsters-dead))
@@ -121,7 +130,7 @@
   (interactive)
   (monster-hit (pick-monster)
                (+ 2 (randval (ash orc-battle-player-strength -1))))
-  (phase-two))
+  (phase-one))
 
 (defun player-double-swing ()
   (interactive)
@@ -133,14 +142,14 @@
     (monster-hit (pick-monster) x)
     (unless (monsters-dead)
       (monster-hit (pick-monster) x)))
-  (phase-two))
+  (phase-one))
 
 (defun player-roundhouse ()
   (interactive)
   (dotimes (x (1+ (randval (truncate (/ orc-battle-player-strength 3)))))
     (unless (monsters-dead)
       (monster-hit (random-monster) 1)))
-  (phase-two))
+  (phase-one))
 
 (defun player-attack ()
   (newline)
@@ -160,6 +169,7 @@
 (defun pick-monster ()
   (newline)
   (insert "Monster #:")
+  (recenter -2)
   (let ((x (read-number "Number: ")))
     (if (not (and (integerp x) (>= x 1) (<= x orc-battle-monster-num)))
         (progn (newline)
@@ -180,13 +190,8 @@
                          orc-battle-monster-builders) "monster"))
              (make-vector orc-battle-monster-num nil))))
 
-(defmethod monster-dead (m)
-  (<= (monster-health m) 0))
 (defun monsters-dead ()
   (every 'monster-dead orc-battle-monsters))
-
-(defmethod monster-health (m)
-  (oref m health))
 
 (defun show-monsters ()
   (newline)
@@ -199,7 +204,7 @@
              (insert (int-to-string (incf x)))
              (insert ". ")
              (if (monster-dead m)
-                 (insertc "**dead**" "dark grey" nil)
+                 (insertc "**dead**" "purple" nil)
                  (progn (insert "(Health=")
                          (insert (int-to-string (monster-health m)))
                          (insert ") ")
@@ -207,8 +212,15 @@
          orc-battle-monsters))
   (newline))
 
+;; monster
 (defclass monster nil ((health :initform (randval 10)))
   "A monster")
+
+(defmethod monster-dead (m)
+  (<= (monster-health m) 0))
+
+(defmethod monster-health (m)
+  (oref m health))
 
 (defmethod monster-hit (m x)
   (decf (oref m health) x)
@@ -230,6 +242,7 @@
 
 (defmethod monster-attack (m))
 
+;; orc
 (defclass orc (monster) ((club-level :initform (randval 8)))
   "An orc")
 (push 'orc orc-battle-monster-builders)
@@ -247,6 +260,7 @@
        (newline)
        (decf orc-battle-player-health x)))
 
+;; hydra
 (defclass hydra (monster) nil
   "An hydra")
 (push 'hydra orc-battle-monster-builders)
@@ -275,6 +289,7 @@
     (incf (oref m health))
     (decf orc-battle-player-health x)))
 
+;; slime mold
 (defclass slime-mold (monster) ((sliminess :initform (randval 5)))
   "A slime mold")
 (push 'slime-mold orc-battle-monster-builders)
@@ -295,6 +310,7 @@
          (newline)
          (decf orc-battle-player-health))))
 
+;; brigand
 (defclass brigand (monster) nil
   "A brigand")
 (push 'brigand orc-battle-monster-builders)

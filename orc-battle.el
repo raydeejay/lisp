@@ -71,8 +71,10 @@
 
 (defun orc-battle-cycle ()
     (show-player)
-    (setq orc-battle-player-turns (1+ (truncate (/ (max 0 orc-battle-player-agility) 15))))
-    (setq orc-battle-player-current-turn (1+ orc-battle-player-turns))
+    (setq orc-battle-player-turns
+          (1+ (truncate (/ (max 0 orc-battle-player-agility) 15))))
+    (setq orc-battle-player-current-turn
+          (1+ orc-battle-player-turns))
     (phase-one))
 
 (defun phase-one ()

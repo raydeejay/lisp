@@ -70,7 +70,8 @@
   :group "Orc-Battle"
   (define-key orc-battle-mode-map (kbd "s") 'attack-stab)
   (define-key orc-battle-mode-map (kbd "d") 'attack-double-swing)
-  (define-key orc-battle-mode-map (kbd "r") 'attack-roundhouse))
+  (define-key orc-battle-mode-map (kbd "r") 'attack-roundhouse)
+  (define-key orc-battle-mode-map (kbd "n") 'orc-battle))
 
 (defun orc-battle-init ()
   (init-monsters)
@@ -117,7 +118,7 @@
   (when (monsters-dead-p)
     (insertc "Congratulations! You have vanquished all of your foes." "green" t))
   (newline)
-  (insert "Press q to quit.")
+  (insert "Press q to quit, or n to start a new game..")
   (newline))
 
 (defun init-player ()
@@ -210,16 +211,12 @@
   (let ((x 0))
     (map 'list
          (lambda (m)
-             (newline)
-             (insert "    ")
-             (insert (int-to-string (incf x)))
-             (insert ". ")
-             (if (monster-dead-p m)
-                 (insertc "**dead**" "purple" nil)
-                 (progn (insert "(Health=")
-                         (insert (int-to-string (monster-health m)))
-                         (insert ") ")
-                         (monster-show m))))
+           (newline)
+           (insert (format "%5d. " (incf x)))
+           (if (monster-dead-p m)
+               (insertc "**dead**" "purple" nil)
+             (progn (insert (format "(Health=%2d) " (monster-health m)))
+                    (monster-show m))))
          orc-battle-monsters))
   (newline 2))
 

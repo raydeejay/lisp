@@ -22,8 +22,14 @@
 (defvar orc-battle-monsters nil)
 (defvar orc-battle-monster-builders nil)
 (defvar orc-battle-monster-num 12)
+
 (defvar orc-battle-player-turns 0)
 (defvar orc-battle-player-current-turn 0)
+(defvar orc-battle-player-classes '("knight"
+                                    "rogue"
+                                    "warrior"
+                                    "paladin"))
+(defvar orc-battle-player-class nil)
 
 ;; helpers
 (defun insert-colored-text (str clr bright)

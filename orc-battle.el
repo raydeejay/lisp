@@ -25,10 +25,16 @@
 
 (defvar orc-battle-max-turns 0)
 (defvar orc-battle-remaining-turns 0)
+(defvar orc-battle-player-adjectives '("brave"
+                                       "strong"
+                                       "agile"
+                                       "noble"
+                                       "valiant"))
 (defvar orc-battle-player-classes '("knight"
                                     "rogue"
                                     "warrior"
                                     "paladin"))
+(defvar orc-battle-player-adjective nil)
 (defvar orc-battle-player-class nil)
 
 ;; helpers
@@ -116,22 +122,22 @@
   (setq orc-battle-player-strength 30)
   (setq orc-battle-player-class
         (nth (random (length orc-battle-player-classes))
-             orc-battle-player-classes)))
+             orc-battle-player-classes))
+  (setq orc-battle-player-adjective
+        (nth (random (length orc-battle-player-adjectives))
+             orc-battle-player-adjectives)))
 
 (defun player-dead-p ()
   (<= orc-battle-player-health 0))
 
 (defun show-player ()
   (newline)
-  (insert "You are a valiant ")
-  (insert orc-battle-player-class)
-  (insert " with a health of ")
-  (insert (int-to-string orc-battle-player-health))
-  (insert ", an agility of ")
-  (insert (int-to-string orc-battle-player-agility))
-  (insert ", and a strength of ")
-  (insert (int-to-string orc-battle-player-strength))
-  (insert ".")
+  (insert (format "You are a %s %s with a health of %d, an agility of %d and a strength of %d."
+                  orc-battle-player-adjective
+                  orc-battle-player-class
+                  orc-battle-player-health
+                  orc-battle-player-agility
+                  orc-battle-player-strength))
   (newline))
 
 (defun attack-stab ()

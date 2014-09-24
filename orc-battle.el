@@ -58,6 +58,7 @@
   (orc-battle-mode)
   (font-lock-mode)
   (read-only-mode -1)
+  (erase-buffer)
   (orc-battle-init)
   (let ((inhibit-read-only t))
     (orc-battle-cycle)))

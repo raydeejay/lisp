@@ -1,9 +1,18 @@
-;; orc-battle.el -- fight!
+;;; orc-battle.el --- fight!
 
-;; make this a package
-;; add mode, keybindings, etc
-;; color!
+;; Copyright (C) 2014 raydeejay
 
+;; Author: raydeejay <raydeejay@mailinator.com>
+;; Version: 0.1
+;; Created: 2014-09-24
+;; Package-Requires: ((eieio "0.1"))
+;; Keywords: orc-battle
+
+;; This file is not part of GNU Emacs.
+
+;; MIT license.
+
+;;; Code:
 (require 'eieio)
 
 (defvar orc-battle-player-health nil)

@@ -143,6 +143,7 @@
                   orc-battle-player-strength))
   (newline))
 
+;; Attacks
 (defun attack-stab ()
   (interactive)
   (monster-hit (pick-monster)
@@ -167,6 +168,7 @@
       (monster-hit (random-monster) 1)))
   (orc-battle-take-turn))
 
+;; Choosing monsters
 (defun random-monster ()
   (let ((m (aref orc-battle-monsters (random (length orc-battle-monsters)))))
     (if (monster-dead-p m)
@@ -238,7 +240,7 @@
              (newline))
     (progn (insertc (format "You hit the %s, knocking off %d health points!"
                             (symbol-name (object-class m))
-                            (int-to-string x))
+                            x)
                     "cyan" nil)
            (newline))))
 

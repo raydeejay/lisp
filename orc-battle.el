@@ -61,8 +61,6 @@
   "Major mode for playing the orc-battle game.
 \\{orc-battle-mode-map}"
   :group "Orc-Battle"
-;;  (define-key orc-battle-mode-map (kbd "SPC") 'orc-battle-function)
-;;  (define-key orc-battle-mode-map (kbd "n") 'orc-battle-start)
   (define-key orc-battle-mode-map (kbd "s") 'player-stab)
   (define-key orc-battle-mode-map (kbd "d") 'player-double-swing)
   (define-key orc-battle-mode-map (kbd "r") 'player-roundhouse))

@@ -205,7 +205,7 @@
          orc-battle-monsters))
   (newline))
 
-;; monster
+;; base monster class
 (defclass monster nil ((health :initform (randval 10)))
   "A monster")
 

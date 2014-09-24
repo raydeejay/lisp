@@ -223,7 +223,7 @@
     (progn (insertc (format "You hit the %s, knocking off %d health points!"
                             (symbol-name (object-class m))
                             (int-to-string x))
-                    "light blue" nil)
+                    "cyan" nil)
            (newline))))
 
 (defmethod monster-show (m)

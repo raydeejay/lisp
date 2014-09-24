@@ -97,7 +97,6 @@
   (decf orc-battle-remaining-turns)
   (unless (or (monsters-dead-p) (player-dead-p))
     (show-monsters)
-    (newline)
     (insert "Attack style: [s]tab [d]ouble swing [r]oundhouse:")
     (newline)
     (recenter -2))
@@ -109,6 +108,7 @@
        (lambda(m)
          (or (monster-dead-p m) (monster-attack m)))
        orc-battle-monsters)
+  (newline)
   (orc-battle-cycle))
 
 (defun end-game ()
@@ -177,18 +177,19 @@
         m)))
 
 (defun pick-monster ()
-  (newline)
   (insert "Monster #:")
   (recenter -2)
   (let ((x (read-number "Number: ")))
     (if (not (and (integerp x) (>= x 1) (<= x orc-battle-monster-num)))
-        (progn (newline)
+        (progn (newline 2)
                (insert "That is not a valid monster number.")
+               (newline 2)
                (pick-monster))
         (let ((m (aref orc-battle-monsters (1- x))))
           (if (monster-dead-p m)
-              (progn (newline)
+              (progn (newline 2)
                      (insert "That monster is already dead.")
+                     (newline 2)
                      (pick-monster))
               m)))))
 
@@ -220,7 +221,7 @@
                          (insert ") ")
                          (monster-show m))))
          orc-battle-monsters))
-  (newline))
+  (newline 2))
 
 ;; base monster class
 (defclass monster nil ((health :initform (randval 10)))

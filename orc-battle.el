@@ -216,20 +216,18 @@
 (defmethod monster-hit (m x)
   (decf (oref m health) x)
   (if (monster-dead-p m)
-      (progn (insertc "You killed the " "green" nil)
-             (insertc (symbol-name (object-class m)) "green" nil)
-             (insertc "! " "green" nil)
+      (progn (insertc (format "You killed the %s!"
+                              (symbol-name (object-class m)))
+                      "green" nil)
              (newline))
-      (progn (insert "You hit the ")
-             (insert (symbol-name (object-class m)))
-             (insert ", knocking off ")
-             (insert (int-to-string x))
-             (insert " health points! ")
-             (newline))))
+    (progn (insertc (format "You hit the %s, knocking off %d health points!"
+                            (symbol-name (object-class m))
+                            (int-to-string x))
+                    "light blue" nil)
+           (newline))))
 
 (defmethod monster-show (m)
-  (insert "A fierce ")
-  (insert (symbol-name (object-class m))))
+  (insert (format "A fierce %s." (symbol-name (object-class m)))))
 
 (defmethod monster-attack (m))
 

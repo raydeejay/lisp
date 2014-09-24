@@ -23,8 +23,8 @@
 (defvar orc-battle-monster-builders nil)
 (defvar orc-battle-monster-num 12)
 
-(defvar orc-battle-player-turns 0)
-(defvar orc-battle-player-current-turn 0)
+(defvar orc-battle-max-turns 0)
+(defvar orc-battle-remaining-turns 0)
 (defvar orc-battle-player-classes '("knight"
                                     "rogue"
                                     "warrior"
@@ -72,22 +72,22 @@
 (defun orc-battle-take-turn ()
   (if (or (monsters-dead-p) (player-dead-p))
       (end-game)
-    (if (zerop orc-battle-player-current-turn)
+    (if (zerop orc-battle-remaining-turns)
         (monster-turn)
       (player-turn))))
 
 (defun orc-battle-cycle ()
   (insertc "A new round begins!" "cyan" nil)
   (newline)
-  (setq orc-battle-player-turns
+  (setq orc-battle-max-turns
         (1+ (truncate (/ (max 0 orc-battle-player-agility) 15))))
-  (setq orc-battle-player-current-turn
-        orc-battle-player-turns)
+  (setq orc-battle-remaining-turns
+        orc-battle-max-turns)
   (show-player)
   (orc-battle-take-turn))
 
 (defun player-turn ()
-  (decf orc-battle-player-current-turn)
+  (decf orc-battle-remaining-turns)
   (unless (or (monsters-dead-p) (player-dead-p))
     (show-monsters)
     (newline)

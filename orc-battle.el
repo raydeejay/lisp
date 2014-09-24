@@ -115,12 +115,15 @@
 
 (defun show-player ()
   (newline)
-  (insert "You are a valiant knight with a health of ")
+  (insert "You are a valiant ")
+  (insert orc-battle-player-class)
+  (insert " with a health of ")
   (insert (int-to-string orc-battle-player-health))
   (insert ", an agility of ")
   (insert (int-to-string orc-battle-player-agility))
   (insert ", and a strength of ")
   (insert (int-to-string orc-battle-player-strength))
+  (insert ".")
   (newline))
 
 (defun attack-stab ()

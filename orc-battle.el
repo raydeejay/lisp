@@ -81,8 +81,10 @@
   (when (= orc-battle-player-current-turn 0) (phase-two))
   (unless (or (monsters-dead-p) (player-dead-p))
     (show-monsters)
-    (player-attack)
+    (newline)
     (decf orc-battle-player-current-turn)
+    (insert "Attack style: [s]tab [d]ouble swing [r]oundhouse:")
+    (newline)
     (recenter -2))
   (newline))
 
@@ -150,15 +152,6 @@
     (unless (monsters-dead-p)
       (monster-hit (random-monster) 1)))
   (phase-one))
-
-(defun player-attack ()
-  (newline)
-  (insert "Attack style: [s]tab [d]ouble swing [r]oundhouse:")
-  ;; (case (read)
-  ;;   (s (player-stab))
-  ;;   (d (player-double-swing))
-  ;;   (otherwise (player-roundhouse)))
-  (newline))
 
 (defun random-monster ()
   (let ((m (aref orc-battle-monsters (random (length orc-battle-monsters)))))

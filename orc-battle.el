@@ -114,7 +114,10 @@
   (when (player-dead-p)
     (insertc "You have been killed. Game Over." "red" nil))
   (when (monsters-dead-p)
-    (insertc "Congratulations! You have vanquished all of your foes." "green" t)))
+    (insertc "Congratulations! You have vanquished all of your foes." "green" t))
+  (newline)
+  (insert "Press q to quit.")
+  (newline))
 
 (defun init-player ()
   (setq orc-battle-player-health 30)

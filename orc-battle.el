@@ -268,3 +268,4 @@ strength points! ")
            (newline)
            (decf orc-battle-player-strength 2)))))
 
+;;; orc-battle.el ends here

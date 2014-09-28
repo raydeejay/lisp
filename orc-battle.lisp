@@ -1,46 +1,24 @@
 ;;; orc-battle.lisp --- an epic battle
 
 (defpackage :net.raydeejay.orc-battle
-  (:use :common-lisp)
-  (:export :princ-attr
-           :princa))
+  (:use :cl)
+  (:export :start))
 
 (in-package :net.raydeejay.orc-battle)
 
-(defparameter *player-health* nil)
-(defparameter *player-agility* nil)
-(defparameter *player-strength* nil)
+(defvar *player-health* nil)
+(defvar *player-agility* nil)
+(defvar *player-strength* nil)
 
-(defparameter *monsters* nil)
-(defparameter *monster-builders* nil)
-(defparameter *monster-num* 12)
+(defvar *monsters* nil)
+(defvar *monster-builders* nil)
+(defvar *monster-num* 12)
 
+;; a little helper function
 (defun randval (n)
   (1+ (random (max 1 n))))
 
-(defun start ()
-  (init-monsters)
-  (init-player)
-  (game-loop)
-  (when (player-dead)
-    (princ "You have been killed. Game Over."))
-  (when (monsters-dead)
-    (princ "Congratulations! You have vanquished all of your foes.")))
-
-(defun game-loop ()
-  (unless (or (player-dead) (monsters-dead))
-    (show-player)
-    (dotimes (k (1+ (truncate (/ (max 0 *player-agility*) 15))))
-      (unless (monsters-dead)
-        (show-monsters)
-        (player-attack)))
-    (fresh-line)
-    (map 'list
-         (lambda(m)
-           (or (monster-dead m) (monster-attack m)))
-         *monsters*)
-    (game-loop)))
-
+;; player related functions
 (defun init-player ()
   (setf *player-health* 30)
   (setf *player-agility* 30)
@@ -58,23 +36,32 @@
   (princ ", and a strength of ")
   (princ *player-strength*))
 
-(defun player-attack ()
-  (fresh-line)
-  (princ "Attack style: [s]tab [d]ouble swing [r]oundhouse:")
-  (finish-output nil)
-  (case (read)
-    (s (monster-hit (pick-monster)
-                    (+ 2 (randval (ash *player-strength* -1)))))
-    (d (let ((x (randval (truncate (/ *player-strength* 6)))))
-         (princ "Your double swing has a strength of ")
-         (princ x)
-         (fresh-line)
-         (monster-hit (pick-monster) x)
-         (unless (monsters-dead)
-           (monster-hit (pick-monster) x))))
-    (otherwise (dotimes (x (1+ (randval (truncate (/ *player-strength* 3)))))
-                 (unless (monsters-dead)
-                   (monster-hit (random-monster) 1))))))
+;; monster class
+(defstruct monster (health (randval 10)))
+
+(defun monster-dead (m)
+  (<= (monster-health m) 0))
+
+(defun monsters-dead ()
+  (every #'monster-dead *monsters*))
+
+(defmethod monster-hit (m x)
+  (decf (monster-health m) x)
+  (if (monster-dead m)
+      (progn (princ "You killed the ")
+             (princ (type-of m))
+             (princ "! "))
+      (progn (princ "You hit the ")
+             (princ (type-of m))
+             (princ ", knocking off ")
+             (princ x)
+             (princ " health points! "))))
+
+(defmethod monster-show (m)
+  (princ "A fierce ")
+  (princ (type-of m)))
+
+(defmethod monster-attack (m))
 
 (defun random-monster ()
   (let ((m (aref *monsters* (random (length *monsters*)))))
@@ -96,19 +83,6 @@
                      (pick-monster))
               m)))))
 
-(defun init-monsters ()
-  (setf *monsters*
-        (map 'vector
-             (lambda (x)
-               (funcall (nth (random (length *monster-builders*))
-                         *monster-builders*)))
-             (make-array *monster-num*))))
-
-(defun monster-dead (m)
-  (<= (monster-health m) 0))
-(defun monsters-dead ()
-  (every #'monster-dead *monsters*))
-
 (defun show-monsters ()
   (fresh-line)
   (princ "Your foes:")
@@ -127,25 +101,7 @@
                          (monster-show m))))
          *monsters*)))
 
-(defstruct monster (health (randval 10)))
-
-(defmethod monster-hit (m x)
-  (decf (monster-health m) x)
-  (if (monster-dead m)
-      (progn (princ "You killed the ")
-             (princ (type-of m))
-             (princ "! "))
-      (progn (princ "You hit the ")
-             (princ (type-of m))
-             (princ ", knocking off ")
-             (princ x)
-             (princ " health points! "))))
-
-(defmethod monster-show (m)
-  (princ "A fierce ")
-  (princ (type-of m)))
-
-(defmethod monster-attack (m))
+;; orc
 
 (defstruct (orc (:include monster)) (club-level (randval 8)))
 (push #'make-orc *monster-builders*)
@@ -161,6 +117,8 @@
        (princ x)
        (princ " of your health points. ")
        (decf *player-health* x)))
+
+;; hydra
 
 (defstruct (hydra (:include monster)))
 (push #'make-hydra *monster-builders*)
@@ -187,6 +145,8 @@ falls to the floor!")
     (incf (monster-health m))
     (decf *player-health* x)))
 
+;; slime mold
+
 (defstruct (slime-mold (:include monster)) (sliminess (randval 5)))
 (push #'make-slime-mold *monster-builders*)
 
@@ -205,6 +165,8 @@ by ")
          (princ "It also squirts in your face, taking away a health point! ")
          (decf *player-health*))))
 
+;; brigand
+
 (defstruct (brigand (:include monster)))
 (push #'make-brigand *monster-builders*)
 
@@ -222,4 +184,58 @@ agility points! ")
            (princ "A brigand cuts your arm with his whip, taking off 2
 strength points! ")
            (decf *player-strength* 2)))))
+
+;; turn function
+(defun player-attack ()
+  (fresh-line)
+  (princ "Attack style: [s]tab [d]ouble swing [r]oundhouse:")
+  (finish-output nil)
+  (case (read)
+    (s (monster-hit (pick-monster)
+                    (+ 2 (randval (ash *player-strength* -1)))))
+    (d (let ((x (randval (truncate (/ *player-strength* 6)))))
+         (princ "Your double swing has a strength of ")
+         (princ x)
+         (fresh-line)
+         (monster-hit (pick-monster) x)
+         (unless (monsters-dead)
+           (monster-hit (pick-monster) x))))
+    (otherwise (dotimes (x (1+ (randval (truncate (/ *player-strength* 3)))))
+                 (unless (monsters-dead)
+                   (monster-hit (random-monster) 1))))))
+
+;; monster initialization
+(defun init-monsters ()
+  (setf *monsters*
+        (map 'vector
+             (lambda (x)
+               (declare (ignorable x))
+               (funcall (nth (random (length *monster-builders*))
+                             *monster-builders*)))
+             (make-array *monster-num*))))
+
+;; main loop
+(defun game-loop ()
+  (unless (or (player-dead) (monsters-dead))
+    (show-player)
+    (dotimes (k (1+ (truncate (/ (max 0 *player-agility*) 15))))
+      (unless (monsters-dead)
+        (show-monsters)
+        (player-attack)))
+    (fresh-line)
+    (map 'list
+         (lambda (m)
+           (or (monster-dead m) (monster-attack m)))
+         *monsters*)
+    (game-loop)))
+
+;; exported function to start the game
+(defun start ()
+  (init-monsters)
+  (init-player)
+  (game-loop)
+  (when (player-dead)
+    (princ "You have been killed. Game Over."))
+  (when (monsters-dead)
+    (princ "Congratulations! You have vanquished all of your foes.")))
 

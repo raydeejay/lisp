@@ -33,12 +33,16 @@
 ;; print a variable number of arguments, which can be strings or keywords
 ;; corresponding to entries in *attributes*
 (defun princa (&rest rest)
-  (let ((head (car (flatten rest)))
-        (tail (cdr (flatten rest))))
+  (let ((head (car (flatten rest))))
     (when head
       (if (keywordp head)
           (princ-attr head)
-          (princ head)))
-    (when tail
-      (princa tail))))
+          (princ head))
+      (princa (cdr (flatten rest))))))
 
+;; a demo
+(defun ansi-demo ()
+  (mapc (lambda (x)
+          (princa (car x) "This is " (symbol-name (car x)) "." :reset)
+          (fresh-line))
+        *attributes*))

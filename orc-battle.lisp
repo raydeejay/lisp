@@ -1,3 +1,12 @@
+;;; orc-battle.lisp --- an epic battle
+
+(defpackage :net.raydeejay.orc-battle
+  (:use :common-lisp)
+  (:export :princ-attr
+           :princa))
+
+(in-package :net.raydeejay.orc-battle)
+
 (defparameter *player-health* nil)
 (defparameter *player-agility* nil)
 (defparameter *player-strength* nil)

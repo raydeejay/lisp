@@ -18,7 +18,7 @@
 (defun randval (n)
   (1+ (random (max 1 n))))
 
-(defun orc-battle ()
+(defun start ()
   (init-monsters)
   (init-player)
   (game-loop)

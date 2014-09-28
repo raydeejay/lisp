@@ -209,7 +209,7 @@ strength points! ")
   (setf *monsters*
         (map 'vector
              (lambda (x)
-               (declare (ignorable x))
+               (declare (ignore x))
                (funcall (nth (random (length *monster-builders*))
                              *monster-builders*)))
              (make-array *monster-num*))))

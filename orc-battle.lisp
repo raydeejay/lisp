@@ -255,8 +255,10 @@
   (init-monsters)
   (init-player)
   (game-loop)
+  (fresh-line)
   (when (player-dead)
     (princa :red "You have been killed. Game Over." :reset))
   (when (monsters-dead)
-    (princa :green :bold "Congratulations! You have vanquished all of your foes." :reset)))
+    (princa :green :bold "Congratulations! You have vanquished all of your foes." :reset))
+  (fresh-line))
 

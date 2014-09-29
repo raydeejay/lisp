@@ -2,6 +2,7 @@
 
 (defpackage :net.raydeejay.orc-battle
   (:use :cl :ansi)
+  (:import-from :ansi :princa)
   (:export :start))
 
 (in-package :net.raydeejay.orc-battle)

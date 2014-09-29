@@ -3,7 +3,8 @@
 (defpackage :net.raydeejay.ansi
   (:use :common-lisp)
   (:export :princ-attr
-           :princa)
+           :princa
+           :ansi-demo)
   (:nicknames :ansi))
 
 (in-package :net.raydeejay.ansi)

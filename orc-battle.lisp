@@ -219,7 +219,6 @@
            (unless (monsters-dead)
              (monster-hit (pick-monster) x))))
     (#\r (dotimes (x (1+ (randval (truncate (/ *player-strength* 3)))))
-           (princa :magenta "Attack " x)
            (unless (monsters-dead)
              (monster-hit (random-monster) 1))))
     (otherwise (player-attack))))

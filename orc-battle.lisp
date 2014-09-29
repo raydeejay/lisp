@@ -98,6 +98,9 @@
                          (monster-show m))))
          *monsters*)))
 
+(defun monsters-dead ()
+  (every #'monster-dead *monsters*))
+
 ;; orc
 
 (defstruct (orc (:include monster)) (club-level (randval 8)))

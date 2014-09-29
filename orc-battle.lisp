@@ -6,6 +6,10 @@
 
 (in-package :net.raydeejay.orc-battle)
 
+;; selectively run code if inside/outside SLIME
+;; #+:swank ()
+;; #-:swank ()
+
 (defvar *player-health* nil)
 (defvar *player-agility* nil)
 (defvar *player-strength* nil)

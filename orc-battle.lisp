@@ -34,12 +34,12 @@
 
 (defun show-player ()
   (fresh-line)
-  (princ "You are a valiant knight with a health of ")
-  (princ *player-health*)
-  (princ ", an agility of ")
-  (princ *player-agility*)
-  (princ ", and a strength of ")
-  (princ *player-strength*))
+  (princa "You are a valiant knight with a health of "
+          *player-health*
+          ", an agility of "
+          *player-agility*
+          ", and a strength of "
+          *player-strength*))
 
 ;; monster class
 (defstruct monster (health (randval 10)))
@@ -54,20 +54,21 @@
 (defmethod monster-hit (m x)
   (decf (monster-health m) x)
   (if (monster-dead m)
-      (progn (princ "You killed the ")
-             (princ (type-of m))
-             (princ "! "))
-      (progn (princ "You hit the ")
-             (princ (type-of m))
-             (princ ", knocking off ")
-             (princ x)
-             (princ " health points! "))))
+      (progn (princa :green
+                     "You killed the "
+                     (type-of m)
+                     "! "
+                     :reset))
+      (progn (princa "You hit the "
+                     (type-of m)
+                     ", knocking off "
+                     x
+                     " health points! "))))
 
 (defgeneric monster-show (m))
 
 (defmethod monster-show (m)
-  (princ "A fierce ")
-  (princ (type-of m)))
+  (princa "A fierce " (type-of m)))
 
 (defgeneric monster-attack (m))
 
@@ -96,18 +97,16 @@
 
 (defun show-monsters ()
   (fresh-line)
-  (ansi:princa :red "Your foes:" :reset)
+  (princa :red "Your foes:" :reset)
   (let ((x 0))
     (map 'list
          (lambda (m)
-             (fresh-line)
-             (ansi:princa "    " :bold (incf x) ". " :reset)
-             (if (monster-dead m)
-                 (princ "**dead**")
-                 (progn (princ "(Health=")
-                         (princ (monster-health m))
-                         (princ ") ")
-                         (monster-show m))))
+           (fresh-line)
+           (princa "    " :bold (incf x) ". " :reset)
+           (if (monster-dead m)
+               (princa :magenta "**dead**" :reset)
+               (progn (princa "[" (monster-health m) "] ")
+                      (monster-show m))))
          *monsters*)))
 
 (defun monsters-dead ()

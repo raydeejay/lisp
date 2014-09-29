@@ -1,7 +1,7 @@
 ;;; orc-battle.lisp --- an epic battle
 
 (defpackage :net.raydeejay.orc-battle
-  (:use :cl)
+  (:use :cl :ansi)
   (:export :start))
 
 (in-package :net.raydeejay.orc-battle)
@@ -82,14 +82,12 @@
 
 (defun show-monsters ()
   (fresh-line)
-  (princ "Your foes:")
+  (ansi:princa :red "Your foes:" :reset)
   (let ((x 0))
     (map 'list
          (lambda (m)
              (fresh-line)
-             (princ "    ")
-             (princ (incf x))
-             (princ ". ")
+             (ansi:princa "    " :bold (incf x) ". " :reset)
              (if (monster-dead m)
                  (princ "**dead**")
                  (progn (princ "(Health=")

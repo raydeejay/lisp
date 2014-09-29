@@ -260,5 +260,6 @@
     (princa :red "You have been killed. Game Over." :reset))
   (when (monsters-dead)
     (princa :green :bold "Congratulations! You have vanquished all of your foes." :reset))
-  (fresh-line))
+  (fresh-line)
+  (sb-ext:quit))
 

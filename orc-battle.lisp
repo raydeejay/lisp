@@ -39,11 +39,8 @@
 ;; monster class
 (defstruct monster (health (randval 10)))
 
-(defun monster-dead (m)
+(defmethod monster-dead (m)
   (<= (monster-health m) 0))
-
-(defun monsters-dead ()
-  (every #'monster-dead *monsters*))
 
 (defmethod monster-hit (m x)
   (decf (monster-health m) x)

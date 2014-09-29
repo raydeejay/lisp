@@ -143,8 +143,7 @@
 (defmethod monster-hit ((m hydra) x)
   (decf (monster-health m) x)
   (if (monster-dead m)
-      (progn (princ "The corpse of the fully decapitated and decapacitated hydra
-falls to the floor!")
+      (progn (princ "The corpse of the fully decapitated and decapacitated hydra falls to the floor!")
              (fresh-line))
       (progn (princ "You lop off ")
              (princ x)
@@ -171,8 +170,7 @@ falls to the floor!")
 
 (defmethod monster-attack ((m slime-mold))
   (let ((x (randval (slime-mold-sliminess m))))
-    (princ "A slime mold wraps around your legs and decreases your agility
-by ")
+    (princ "A slime mold wraps around your legs and decreases your agility by ")
     (princ x)
     (princ "! ")
     (fresh-line)
@@ -190,18 +188,15 @@ by ")
 (defmethod monster-attack ((m brigand))
   (let ((x (max *player-health* *player-agility* *player-strength*)))
     (cond ((= x *player-health*)
-           (princ "A brigand hits you with his slingshot, taking off 2 health
-points! ")
+           (princ "A brigand hits you with his slingshot, taking off 2 health points! ")
            (fresh-line)
            (decf *player-health* 2))
           ((= x *player-agility*)
-           (princ "A brigand catches your leg with his whip, taking off 2
-agility points! ")
+           (princ "A brigand catches your leg with his whip, taking off 2 agility points! ")
            (fresh-line)
            (decf *player-agility* 2))
           ((= x *player-strength*)
-           (princ "A brigand cuts your arm with his whip, taking off 2
-strength points!")
+           (princ "A brigand cuts your arm with his whip, taking off 2 strength points!")
            (fresh-line)
            (decf *player-strength* 2)))))
 

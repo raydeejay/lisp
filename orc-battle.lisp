@@ -106,10 +106,10 @@
     (map 'list
          (lambda (m)
            (fresh-line)
-           (princa "    " :bold (incf x) ". " :reset)
+           (princa "    " :bold (format nil "~2d" (incf x)) ". " :reset)
            (if (monster-dead m)
                (princa :magenta "**dead**" :reset)
-               (progn (princa "[" (monster-health m) "] ")
+               (progn (princa "[" (format nil "~2d" (monster-health m)) "] ")
                       (monster-show m))))
          *monsters*)))
 

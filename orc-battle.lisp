@@ -34,12 +34,15 @@
 
 (defun show-player ()
   (fresh-line)
-  (princa "You are a valiant knight with a health of "
+  (princa :yellow
+          "You are a valiant knight with a health of "
           *player-health*
           ", an agility of "
           *player-agility*
           ", and a strength of "
-          *player-strength*))
+          *player-strength*
+          "."
+          :reset))
 
 ;; monster class
 (defstruct monster (health (randval 10)))
@@ -63,7 +66,8 @@
                      (type-of m)
                      ", knocking off "
                      x
-                     " health points! "))))
+                     " health points! ")))
+  (fresh-line))
 
 (defgeneric monster-show (m))
 

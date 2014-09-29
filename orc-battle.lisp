@@ -83,7 +83,7 @@
 
 (defun pick-monster ()
   (fresh-line)
-  (princ "Monster #:")
+  (princa :cyan "Monster #: " :reset)
   (finish-output nil)
   (let ((x (read)))
     (if (not (and (integerp x) (>= x 1) (<= x *monster-num*)))
@@ -246,7 +246,7 @@ strength points! ")
   (init-player)
   (game-loop)
   (when (player-dead)
-    (princ "You have been killed. Game Over."))
+    (princa :red "You have been killed. Game Over." :reset))
   (when (monsters-dead)
-    (princ "Congratulations! You have vanquished all of your foes.")))
+    (princa :green :bold "Congratulations! You have vanquished all of your foes." :reset)))
 

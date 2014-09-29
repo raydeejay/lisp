@@ -125,10 +125,10 @@
 
 (defmethod monster-attack ((m orc))
   (let ((x (randval (orc-club-level m))))
-       (princ "An orc swings his club at you and knocks off ")
-       (princ x)
-       (princ " of your health points. ")
-       (decf *player-health* x)))
+    (princ "An orc swings his club at you and knocks off ")
+    (princ x)
+    (princ " of your health points. ")
+    (decf *player-health* x)))
 
 ;; hydra
 
@@ -146,8 +146,8 @@
       (princ "The corpse of the fully decapitated and decapacitated hydra
 falls to the floor!")
       (progn (princ "You lop off ")
-              (princ x)
-              (princ " of the hydra's heads! "))))
+             (princ x)
+             (princ " of the hydra's heads! "))))
 
 (defmethod monster-attack ((m hydra))
   (let ((x (randval (ash (monster-health m) -1))))
@@ -168,14 +168,14 @@ falls to the floor!")
 
 (defmethod monster-attack ((m slime-mold))
   (let ((x (randval (slime-mold-sliminess m))))
-       (princ "A slime mold wraps around your legs and decreases your agility
+    (princ "A slime mold wraps around your legs and decreases your agility
 by ")
-       (princ x)
-       (princ "! ")
-       (decf *player-agility* x)
-       (when (zerop (random 2))
-         (princ "It also squirts in your face, taking away a health point! ")
-         (decf *player-health*))))
+    (princ x)
+    (princ "! ")
+    (decf *player-agility* x)
+    (when (zerop (random 2))
+      (princ "It also squirts in your face, taking away a health point! ")
+      (decf *player-health*))))
 
 ;; brigand
 

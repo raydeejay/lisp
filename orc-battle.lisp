@@ -39,8 +39,12 @@
 ;; monster class
 (defstruct monster (health (randval 10)))
 
+(defgeneric monster-dead (m))
+
 (defmethod monster-dead (m)
   (<= (monster-health m) 0))
+
+(defgeneric monster-hit (m x))
 
 (defmethod monster-hit (m x)
   (decf (monster-health m) x)
@@ -54,12 +58,17 @@
              (princ x)
              (princ " health points! "))))
 
+(defgeneric monster-show (m))
+
 (defmethod monster-show (m)
   (princ "A fierce ")
   (princ (type-of m)))
 
+(defgeneric monster-attack (m))
+
 (defmethod monster-attack (m))
 
+;; functions that deal with monsters
 (defun random-monster ()
   (let ((m (aref *monsters* (random (length *monsters*)))))
     (if (monster-dead m)

@@ -128,9 +128,9 @@
 
 (defmethod monster-attack ((m orc))
   (let ((x (randval (orc-club-level m))))
-    (princ "An orc swings his club at you and knocks off ")
-    (princ x)
-    (princ " of your health points. ")
+    (princa "An orc swings his club at you and knocks off "
+            x
+            " of your health points. ")
     (fresh-line)
     (decf *player-health* x)))
 
@@ -149,16 +149,16 @@
   (if (monster-dead m)
       (progn (princ "The corpse of the fully decapitated and decapacitated hydra falls to the floor!")
              (fresh-line))
-      (progn (princ "You lop off ")
-             (princ x)
-             (princ " of the hydra's heads! ")
+      (progn (princa "You lop off "
+                     x
+                     " of the hydra's heads! ")
              (fresh-line))))
 
 (defmethod monster-attack ((m hydra))
   (let ((x (randval (ash (monster-health m) -1))))
-    (princ "A hydra attacks you with ")
-    (princ x)
-    (princ " of its heads! It also grows back one more head! ")
+    (princa "A hydra attacks you with "
+            x
+            " of its heads! It also grows back one more head! ")
     (fresh-line)
     (incf (monster-health m))
     (decf *player-health* x)))

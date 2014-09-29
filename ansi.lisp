@@ -29,7 +29,7 @@
 
 ;; print an escape sequence that corresponds to ATTR
 (defun princ-attr (attr)
-  (princ (format nil "~c[~am" #\Esc (cdr (assoc attr attributes)))))
+  (princ (format nil "~c[~am" #\Esc (cdr (assoc attr *attributes*)))))
 
 ;; print a variable number of arguments, which can be strings or keywords
 ;; corresponding to entries in *attributes*

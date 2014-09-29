@@ -127,6 +127,7 @@
     (princ "An orc swings his club at you and knocks off ")
     (princ x)
     (princ " of your health points. ")
+    (fresh-line)
     (decf *player-health* x)))
 
 ;; hydra
@@ -142,17 +143,20 @@
 (defmethod monster-hit ((m hydra) x)
   (decf (monster-health m) x)
   (if (monster-dead m)
-      (princ "The corpse of the fully decapitated and decapacitated hydra
+      (progn (princ "The corpse of the fully decapitated and decapacitated hydra
 falls to the floor!")
+             (fresh-line))
       (progn (princ "You lop off ")
              (princ x)
-             (princ " of the hydra's heads! "))))
+             (princ " of the hydra's heads! ")
+             (fresh-line))))
 
 (defmethod monster-attack ((m hydra))
   (let ((x (randval (ash (monster-health m) -1))))
     (princ "A hydra attacks you with ")
     (princ x)
     (princ " of its heads! It also grows back one more head! ")
+    (fresh-line)
     (incf (monster-health m))
     (decf *player-health* x)))
 
@@ -171,9 +175,11 @@ falls to the floor!")
 by ")
     (princ x)
     (princ "! ")
+    (fresh-line)
     (decf *player-agility* x)
     (when (zerop (random 2))
       (princ "It also squirts in your face, taking away a health point! ")
+      (fresh-line)
       (decf *player-health*))))
 
 ;; brigand
@@ -186,20 +192,23 @@ by ")
     (cond ((= x *player-health*)
            (princ "A brigand hits you with his slingshot, taking off 2 health
 points! ")
+           (fresh-line)
            (decf *player-health* 2))
           ((= x *player-agility*)
            (princ "A brigand catches your leg with his whip, taking off 2
 agility points! ")
+           (fresh-line)
            (decf *player-agility* 2))
           ((= x *player-strength*)
            (princ "A brigand cuts your arm with his whip, taking off 2
-strength points! ")
+strength points!")
+           (fresh-line)
            (decf *player-strength* 2)))))
 
 ;; turn function
 (defun player-attack ()
   (fresh-line)
-  (princ "Attack style: [s]tab [d]ouble swing [r]oundhouse:")
+  (princa :cyan :bold "Attack style: [s]tab [d]ouble swing [r]oundhouse: " :reset)
   (finish-output nil)
   (case (read-char)
     (#\s (monster-hit (pick-monster)
